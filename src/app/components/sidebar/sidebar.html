@@ -1,0 +1,68 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+  <a routerLink="/dashboard" class="sidebar-logo" [attr.aria-label]="'SIDEBAR.GO_DASHBOARD' | translate">
+    <div class="sidebar-logo-icon">
+      <mat-icon>eco</mat-icon>
+    </div>
+    <div class="sidebar-logo-text">
+      <span class="sidebar-logo-name">AgroSync</span>
+      <span class="sidebar-logo-tag">{{ 'APP.NAME' | translate }}</span>
+    </div>
+  </a>
+
+  <button
+    class="sidebar-toggle"
+    type="button"
+    (click)="toggleCollapsed()"
+    [attr.aria-label]="(collapsed ? 'SIDEBAR.OPEN' : 'SIDEBAR.COLLAPSE') | translate"
+  >
+    <mat-icon>{{ collapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+  </button>
+
+  <div class="sidebar-device">
+    <span class="sidebar-device-dot"></span>
+    <div class="sidebar-device-info">
+      <div class="sidebar-device-name">ESP32 - Zone A</div>
+      <div class="sidebar-device-status">{{ 'SIDEBAR.DEVICE_STATUS' | translate }}</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">{{ 'SIDEBAR.MONITOR' | translate }}</div>
+
+    <a routerLink="/dashboard" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>dashboard</mat-icon></span>
+      <span class="nav-label">{{ 'NAV.DASHBOARD' | translate }}</span>
+    </a>
+
+    <a routerLink="/history" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>history</mat-icon></span>
+      <span class="nav-label">{{ 'NAV.HISTORY' | translate }}</span>
+    </a>
+
+    <a routerLink="/alerts" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>notifications</mat-icon></span>
+      <span class="nav-label">{{ 'NAV.ALERTS' | translate }}</span>
+      <span class="nav-badge">3</span>
+    </a>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">{{ 'SIDEBAR.CONTROL' | translate }}</div>
+
+    <a routerLink="/pump-control" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>water_drop</mat-icon></span>
+      <span class="nav-label">{{ 'NAV.PUMP_CONTROL' | translate }}</span>
+    </a>
+
+    <a routerLink="/settings" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>settings</mat-icon></span>
+      <span class="nav-label">{{ 'NAV.SETTINGS' | translate }}</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a routerLink="/login">
+      <span class="nav-icon"><mat-icon>logout</mat-icon></span>
+      <span class="nav-label">{{ 'NAV.LOGOUT' | translate }}</span>
+    </a>
+  </div>
+</aside>

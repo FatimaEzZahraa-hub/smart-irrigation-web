@@ -1,0 +1,140 @@
+<div class="app-shell" [class.sidebar-collapsed]="sidebarCollapsed">
+  <app-sidebar (collapsedChange)="onSidebarCollapsedChange($event)"></app-sidebar>
+
+  <div class="main-panel">
+    <header class="topbar">
+      <div class="topbar-left">
+        <p class="topbar-kicker">{{ 'APP.NAME' | translate }}</p>
+        <h1>{{ currentTitle | translate }}</h1>
+      </div>
+
+      <div class="topbar-right">
+        <span class="topbar-date">{{ currentDate }}</span>
+        <button
+          class="language-trigger"
+          type="button"
+          [matMenuTriggerFor]="languageMenu"
+          [attr.aria-label]="'LANGUAGE.SELECT' | translate"
+        >
+          <mat-icon>language</mat-icon>
+          <span class="language-label">{{ selectedLanguage.labelKey | translate }}</span>
+          <span class="language-short">{{ selectedLanguage.short }}</span>
+          <mat-icon class="language-arrow">expand_more</mat-icon>
+        </button>
+        <mat-menu #languageMenu="matMenu" xPosition="before" class="language-menu">
+          <button
+            mat-menu-item
+            type="button"
+            *ngFor="let language of languages"
+            class="language-option"
+            [class.active]="language.code === selectedLanguage.code"
+            (click)="changeLanguage(language.code)"
+          >
+            <span class="language-flag">{{ language.flag }}</span>
+            <span class="language-option-label">{{ language.labelKey | translate }}</span>
+            <span class="language-option-short">{{ language.short }}</span>
+            <mat-icon *ngIf="language.code === selectedLanguage.code">check</mat-icon>
+          </button>
+        </mat-menu>
+        <button
+          #notificationsMenuTrigger="matMenuTrigger"
+          class="topbar-icon-btn notification-trigger"
+          type="button"
+          [matMenuTriggerFor]="notificationsMenu"
+          [matBadge]="notificationCount"
+          [matBadgeHidden]="notificationCount === 0"
+          matBadgeColor="warn"
+          matBadgeSize="small"
+          [attr.aria-label]="'NOTIFICATIONS.OPEN' | translate"
+        >
+          <mat-icon>notifications</mat-icon>
+        </button>
+        <mat-menu #notificationsMenu="matMenu" xPosition="before" class="notification-menu">
+          <div class="notification-panel" (click)="$event.stopPropagation()">
+            <div class="notification-panel-header">
+              <div>
+                <p>{{ 'NOTIFICATIONS.EYEBROW' | translate }}</p>
+                <h2>{{ 'NOTIFICATIONS.TITLE' | translate }}</h2>
+              </div>
+              <span class="notification-count">{{ notificationCount }}</span>
+            </div>
+
+            <div class="notification-list">
+              <button
+                class="notification-item"
+                type="button"
+                *ngFor="let notification of recentNotifications"
+              >
+                <span class="notification-icon" [ngClass]="notification.type">
+                  <mat-icon>{{ notification.icon }}</mat-icon>
+                </span>
+                <span class="notification-copy">
+                  <span class="notification-title">{{ notification.titleKey | translate }}</span>
+                  <span class="notification-time">{{ notification.timeKey | translate }}</span>
+                </span>
+              </button>
+            </div>
+
+            <a class="notification-footer" routerLink="/alerts" (click)="closeNotificationsMenu()">
+              {{ 'NOTIFICATIONS.VIEW_ALL' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </a>
+          </div>
+        </mat-menu>
+        <button
+          #profileMenuTrigger="matMenuTrigger"
+          class="topbar-avatar"
+          type="button"
+          [matMenuTriggerFor]="profileMenu"
+          [attr.aria-label]="'PROFILE.OPEN' | translate"
+        >
+          {{ userInitials }}
+        </button>
+        <mat-menu #profileMenu="matMenu" xPosition="before" class="profile-menu">
+          <div class="profile-panel" (click)="$event.stopPropagation()">
+            <div class="profile-panel-header">
+              <span class="profile-avatar">{{ userInitials }}</span>
+              <div>
+                <p>{{ 'PROFILE.EYEBROW' | translate }}</p>
+                <h2>{{ currentUser?.fullName || ('PROFILE.LOADING' | translate) }}</h2>
+              </div>
+            </div>
+
+            <div class="profile-details" *ngIf="currentUser; else profileLoadingState">
+              <div class="profile-detail">
+                <span>{{ 'PROFILE.EMAIL' | translate }}</span>
+                <strong>{{ currentUser.email }}</strong>
+              </div>
+              <div class="profile-detail" *ngIf="currentUser.role">
+                <span>{{ 'PROFILE.ROLE' | translate }}</span>
+                <strong>{{ currentUser.role }}</strong>
+              </div>
+            </div>
+
+            <ng-template #profileLoadingState>
+              <div class="profile-state">
+                <mat-icon>sync</mat-icon>
+                {{ profileLoading ? ('PROFILE.LOADING' | translate) : ('PROFILE.UNAVAILABLE' | translate) }}
+              </div>
+            </ng-template>
+
+            <div class="profile-actions">
+              <button class="profile-action" type="button" (click)="goToSettings()">
+                <mat-icon>settings</mat-icon>
+                {{ 'NAV.SETTINGS' | translate }}
+              </button>
+              <button class="profile-action danger" type="button" (click)="logout()">
+                <mat-icon>logout</mat-icon>
+                {{ 'NAV.LOGOUT' | translate }}
+              </button>
+            </div>
+          </div>
+        </mat-menu>
+      </div>
+    </header>
+
+    <main class="content-area">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,106 @@
+<div class="signup-container">
+  <div class="signup-brand">
+    <div class="brand-logo">
+      <div class="brand-logo-icon">🌿</div>
+      <span class="brand-logo-name">AgroSync</span>
+    </div>
+
+    <h1 class="brand-tagline">
+      {{ 'AUTH.SIGNUP.TAGLINE_1' | translate }}<br>
+      <span>{{ 'AUTH.SIGNUP.TAGLINE_2' | translate }}</span>
+    </h1>
+    <p class="brand-desc">
+      {{ 'AUTH.SIGNUP.DESCRIPTION' | translate }}
+    </p>
+
+    <div class="brand-features">
+      <div class="brand-feature">
+        <span class="brand-feature-dot"></span>
+        {{ 'AUTH.SIGNUP.FEATURE_SENSOR' | translate }}
+      </div>
+      <div class="brand-feature">
+        <span class="brand-feature-dot"></span>
+        {{ 'AUTH.SIGNUP.FEATURE_PUMP' | translate }}
+      </div>
+      <div class="brand-feature">
+        <span class="brand-feature-dot"></span>
+        {{ 'AUTH.SIGNUP.FEATURE_HISTORY' | translate }}
+      </div>
+      <div class="brand-feature">
+        <span class="brand-feature-dot"></span>
+        {{ 'AUTH.SIGNUP.FEATURE_ALERTS' | translate }}
+      </div>
+    </div>
+  </div>
+
+  <div class="signup-form-panel">
+    <div class="signup-card">
+      <p class="signup-card-eyebrow">{{ 'AUTH.SIGNUP.EYEBROW' | translate }}</p>
+      <h2 class="signup-card-title">{{ 'AUTH.SIGNUP.TITLE' | translate }}</h2>
+      <p class="signup-card-subtitle">{{ 'AUTH.SIGNUP.SUBTITLE' | translate }}</p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="signup-username">{{ 'AUTH.SIGNUP.USERNAME' | translate }}</label>
+          <input
+            id="signup-username"
+            class="form-input"
+            type="text"
+            formControlName="username"
+            [placeholder]="'AUTH.SIGNUP.USERNAME_PLACEHOLDER' | translate"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signup-email">{{ 'AUTH.SIGNUP.EMAIL' | translate }}</label>
+          <input
+            id="signup-email"
+            class="form-input"
+            type="email"
+            formControlName="email"
+            [placeholder]="'AUTH.SIGNUP.EMAIL_PLACEHOLDER' | translate"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signup-password">{{ 'AUTH.PASSWORD' | translate }}</label>
+          <input
+            id="signup-password"
+            class="form-input"
+            type="password"
+            formControlName="password"
+            [placeholder]="'AUTH.SIGNUP.PASSWORD_PLACEHOLDER' | translate"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="signup-confirm-password">{{ 'AUTH.SIGNUP.CONFIRM_PASSWORD' | translate }}</label>
+          <input
+            id="signup-confirm-password"
+            class="form-input"
+            type="password"
+            formControlName="confirmPassword"
+            [placeholder]="'AUTH.SIGNUP.CONFIRM_PASSWORD_PLACEHOLDER' | translate"
+          >
+        </div>
+
+        <div *ngIf="successMessage" class="form-message form-message-success">
+          {{ successMessage | translate }}
+        </div>
+
+        <div *ngIf="errorMessage" class="form-message form-message-error">
+          {{ errorMessage | translate }}
+        </div>
+
+        <button class="form-btn" type="submit" [disabled]="isLoading">
+          <span *ngIf="!isLoading">{{ 'AUTH.SIGNUP.SUBMIT' | translate }}</span>
+          <span *ngIf="isLoading">{{ 'AUTH.SIGNUP.LOADING' | translate }}</span>
+        </button>
+      </form>
+
+      <p class="form-footer">
+        {{ 'AUTH.SIGNUP.HAS_ACCOUNT' | translate }} <a routerLink="/login">{{ 'AUTH.LOGIN.SUBMIT' | translate }}</a>
+      </p>
+    </div>
+  </div>
+</div>

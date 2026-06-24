@@ -1,0 +1,187 @@
+<section class="dashboard-content page-content">
+  <section class="top-summary-card surface-card">
+    <div>
+      <p class="eyebrow">{{ 'DASHBOARD.EYEBROW' | translate }}</p>
+      <h2>{{ 'DASHBOARD.TITLE' | translate }}</h2>
+    </div>
+
+    <label class="zone-selector" *ngIf="zones.length > 0">
+      <span>{{ 'DASHBOARD.SELECT_ZONE' | translate }}</span>
+      <select [value]="selectedZoneId" (change)="onZoneChange($event)">
+        <option *ngFor="let zone of zones" [value]="zone.id">
+          {{ zone.nom || zone.emplacement || ('DASHBOARD.DEFAULT_ZONE' | translate) }}
+        </option>
+      </select>
+    </label>
+  </section>
+
+  <section>
+    <p class="section-heading">{{ 'DASHBOARD.LIVE_READINGS' | translate }}</p>
+    <div class="kpi-grid">
+      <article class="kpi-card green">
+        <div class="kpi-card-header">
+          <span class="kpi-card-label">{{ 'DASHBOARD.SOIL_HUMIDITY' | translate }}</span>
+          <div class="kpi-card-icon"><mat-icon>grass</mat-icon></div>
+        </div>
+        <div class="kpi-card-value">{{ humiditeSol }}<span class="kpi-card-unit">%</span></div>
+        <div class="kpi-card-footer">
+          <span class="kpi-card-trend-label">{{ soilStatusKey | translate }}</span>
+        </div>
+      </article>
+
+      <article class="kpi-card amber">
+        <div class="kpi-card-header">
+          <span class="kpi-card-label">{{ 'DASHBOARD.TEMPERATURE' | translate }}</span>
+          <div class="kpi-card-icon"><mat-icon>device_thermostat</mat-icon></div>
+        </div>
+        <div class="kpi-card-value">{{ temperature }}<span class="kpi-card-unit">&deg;C</span></div>
+        <div class="kpi-card-footer">
+          <span class="kpi-card-trend neutral">0.2&deg;</span>
+          <span class="kpi-card-trend-label">{{ 'DASHBOARD.STABLE' | translate }}</span>
+        </div>
+      </article>
+
+      <article class="kpi-card blue">
+        <div class="kpi-card-header">
+          <span class="kpi-card-label">{{ 'DASHBOARD.AIR_HUMIDITY' | translate }}</span>
+          <div class="kpi-card-icon"><mat-icon>water_drop</mat-icon></div>
+        </div>
+        <div class="kpi-card-value">{{ humiditeAir }}<span class="kpi-card-unit">%</span></div>
+        <div class="kpi-card-footer">
+          <span class="kpi-card-trend-label">{{ 'DASHBOARD.SINCE_LAST_HOUR' | translate }}</span>
+        </div>
+      </article>
+
+      <article class="kpi-card purple">
+        <div class="kpi-card-header">
+          <span class="kpi-card-label">{{ 'DASHBOARD.PUMP_STATUS' | translate }}</span>
+          <div class="kpi-card-icon"><mat-icon>power_settings_new</mat-icon></div>
+        </div>
+        <div class="kpi-card-value">
+          <div class="pump-status-badge">
+            <span class="pump-dot" [class.on]="pompe === 'ON'" [class.off]="pompe === 'OFF'"></span>
+            {{ pompe }}
+          </div>
+        </div>
+        <div class="kpi-card-footer">
+          <span class="kpi-card-trend-label">{{ 'DASHBOARD.MANUAL_MODE_ACTIVE' | translate }}</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="field-intelligence-grid">
+    <article class="soil-card surface-card" [ngClass]="soilStatusClass">
+      <div class="panel-heading">
+        <div>
+          <p class="section-heading">{{ 'DASHBOARD.SOIL.CURRENT_TITLE' | translate }}</p>
+          <h3>{{ selectedZoneName }}</h3>
+        </div>
+        <span class="soil-status-pill">
+          <span></span>
+          {{ soilStatusKey | translate }}
+        </span>
+      </div>
+
+      <div class="soil-compact-body">
+        <div class="soil-sensor" [style.--soil-level]="humiditeSol + '%'">
+          <div class="soil-ring">
+            <span class="soil-node node-top"></span>
+            <span class="soil-node node-right"></span>
+            <span class="soil-node node-bottom"></span>
+            <span class="soil-node node-left"></span>
+            <div class="soil-core">
+              <mat-icon>grass</mat-icon>
+              <strong>{{ humiditeSol }}%</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="soil-meta">
+          <div>
+            <span>{{ 'DASHBOARD.SOIL.STATUS' | translate }}</span>
+            <strong>{{ soilStatusKey | translate }}</strong>
+          </div>
+          <div>
+            <span>{{ 'DASHBOARD.SOIL.LAST_UPDATE_LABEL' | translate }}</span>
+            <strong>{{ lastSensorUpdate ? (lastSensorUpdate | date:'shortTime') : ('DASHBOARD.SOIL.LAST_UPDATED' | translate) }}</strong>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="weather-card surface-card" [ngClass]="weatherTone">
+      <ng-container *ngIf="weatherLoading; else premiumWeatherContent">
+        <div class="weather-state">
+          <mat-icon>cloud_sync</mat-icon>
+          <span>{{ 'DASHBOARD.WEATHER.LOADING' | translate }}</span>
+        </div>
+      </ng-container>
+
+      <ng-template #premiumWeatherContent>
+        <ng-container *ngIf="weather && !weatherError; else premiumWeatherErrorTpl">
+          <div class="weather-main">
+            <div>
+              <p class="section-heading">{{ 'DASHBOARD.WEATHER.TITLE' | translate }}</p>
+              <p class="weather-location">{{ selectedZoneLabel }}</p>
+            </div>
+
+            <img
+              *ngIf="weather.icon"
+              class="weather-icon"
+              [src]="weatherService.getIconUrl(weather.icon)"
+              [alt]="weather.description"
+            >
+          </div>
+
+          <div class="weather-temperature">
+            <strong>{{ weather.temperature }}<span>&deg;C</span></strong>
+            <p>{{ weather.description }}</p>
+          </div>
+
+          <div class="weather-metrics">
+            <div class="weather-metric">
+              <mat-icon>water_drop</mat-icon>
+              <span>{{ 'DASHBOARD.WEATHER.HUMIDITY' | translate }}</span>
+              <strong>{{ weather.humidity }}%</strong>
+            </div>
+            <div class="weather-metric">
+              <mat-icon>air</mat-icon>
+              <span>{{ 'DASHBOARD.WEATHER.WIND' | translate }}</span>
+              <strong>{{ weather.windSpeed }} km/h</strong>
+            </div>
+          </div>
+        </ng-container>
+      </ng-template>
+
+      <ng-template #premiumWeatherErrorTpl>
+        <div class="weather-state error">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ weatherError | translate }}</span>
+        </div>
+      </ng-template>
+    </article>
+  </section>
+
+  <section>
+    <p class="section-heading">{{ 'DASHBOARD.QUICK_ACTIONS' | translate }}</p>
+    <div class="quick-actions">
+      <a routerLink="/pump-control" class="quick-action-btn primary">
+        <mat-icon>water_drop</mat-icon>
+        {{ 'DASHBOARD.CONTROL_PUMP' | translate }}
+      </a>
+      <a routerLink="/history" class="quick-action-btn">
+        <mat-icon>query_stats</mat-icon>
+        {{ 'DASHBOARD.VIEW_HISTORY' | translate }}
+      </a>
+      <a routerLink="/alerts" class="quick-action-btn">
+        <mat-icon>notifications_active</mat-icon>
+        {{ 'DASHBOARD.VIEW_ALERTS' | translate }}
+      </a>
+      <a routerLink="/settings" class="quick-action-btn">
+        <mat-icon>tune</mat-icon>
+        {{ 'NAV.SETTINGS' | translate }}
+      </a>
+    </div>
+  </section>
+</section>

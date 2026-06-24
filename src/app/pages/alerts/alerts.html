@@ -1,0 +1,24 @@
+<section class="alerts-page page-content">
+  <header class="alerts-header page-toolbar">
+    <div>
+      <p class="alerts-eyebrow page-eyebrow">{{ 'NAV.ALERTS' | translate }}</p>
+      <h2>{{ 'ALERTS.ACTIVE_ALERTS' | translate }}</h2>
+    </div>
+    <button class="alerts-action-btn app-action-btn" type="button">
+      <mat-icon>mark_email_unread</mat-icon>
+      {{ 'ALERTS.MARK_ALL_READ' | translate }}
+    </button>
+  </header>
+
+  <div class="alerts-list">
+    <article class="alert-card surface-card" *ngFor="let a of alerts">
+      <div class="alert-icon" [ngClass]="a.severity">
+        <mat-icon>{{ a.severity === 'critical' ? 'error' : a.severity === 'warning' ? 'warning' : 'info' }}</mat-icon>
+      </div>
+      <div class="alert-content">
+        <h3>{{ ('ALERTS.SEVERITY.' + a.severity.toUpperCase()) | translate }}</h3>
+        <p>{{ a.message | translate }}</p>
+      </div>
+    </article>
+  </div>
+</section>

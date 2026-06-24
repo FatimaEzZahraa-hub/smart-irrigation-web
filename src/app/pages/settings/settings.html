@@ -1,0 +1,84 @@
+<section class="settings-page page-content">
+  <header class="page-toolbar">
+    <div>
+      <p class="page-eyebrow">{{ 'SETTINGS.CONFIGURATION' | translate }}</p>
+      <h2>{{ 'NAV.SETTINGS' | translate }}</h2>
+    </div>
+  </header>
+
+  <div class="settings-card surface-card">
+    <div class="settings-card-header">
+      <div class="settings-icon profile">
+        <mat-icon>person</mat-icon>
+      </div>
+      <div>
+        <p class="settings-eyebrow">{{ 'PROFILE.EYEBROW' | translate }}</p>
+        <h1>{{ 'PROFILE.ACCOUNT_TITLE' | translate }}</h1>
+      </div>
+    </div>
+
+    <div class="profile-state-card" *ngIf="isLoadingProfile">
+      <mat-icon>sync</mat-icon>
+      {{ 'PROFILE.LOADING' | translate }}
+    </div>
+
+    <div class="profile-state-card error" *ngIf="!isLoadingProfile && profileError">
+      <mat-icon>error_outline</mat-icon>
+      {{ profileError | translate }}
+    </div>
+
+    <div class="profile-grid" *ngIf="!isLoadingProfile && !profileError && user">
+      <div class="profile-field">
+        <span>{{ 'PROFILE.FULL_NAME' | translate }}</span>
+        <strong>{{ user.fullName }}</strong>
+      </div>
+      <div class="profile-field">
+        <span>{{ 'PROFILE.EMAIL' | translate }}</span>
+        <strong>{{ user.email }}</strong>
+      </div>
+      <div class="profile-field" *ngIf="user.role">
+        <span>{{ 'PROFILE.ROLE' | translate }}</span>
+        <strong>{{ user.role }}</strong>
+      </div>
+      <div class="profile-field" *ngIf="user.createdAt">
+        <span>{{ 'PROFILE.CREATED_AT' | translate }}</span>
+        <strong>{{ user.createdAt | date:'mediumDate' }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-card surface-card">
+    <div class="settings-card-header">
+      <div class="settings-icon">
+        <mat-icon>settings</mat-icon>
+      </div>
+      <div>
+        <p class="settings-eyebrow">{{ 'SETTINGS.CONFIGURATION' | translate }}</p>
+        <h1>{{ 'SETTINGS.DEVICE_SETTINGS' | translate }}</h1>
+      </div>
+    </div>
+
+    <div class="settings-item">
+      <label>{{ 'SETTINGS.DEVICE_NAME' | translate }}</label>
+      <input type="text" [placeholder]="'SETTINGS.DEVICE_PLACEHOLDER' | translate">
+    </div>
+
+    <div class="settings-item">
+      <label>{{ 'SETTINGS.LOCATION' | translate }}</label>
+      <input type="text" [placeholder]="'SETTINGS.LOCATION_PLACEHOLDER' | translate">
+    </div>
+
+    <div class="settings-item">
+      <label>{{ 'SETTINGS.IRRIGATION_MODE' | translate }}</label>
+      <select>
+        <option>{{ 'SETTINGS.AUTO' | translate }}</option>
+        <option>{{ 'PUMP.MANUAL' | translate }}</option>
+      </select>
+    </div>
+
+    <button class="settings-save-btn" type="button">
+      <mat-icon>save</mat-icon>
+      {{ 'SETTINGS.SAVE' | translate }}
+    </button>
+  </div>
+</section>

@@ -1,0 +1,106 @@
+<section class="history-page page-content">
+  <header class="page-toolbar">
+    <div>
+      <p class="page-eyebrow">{{ 'HISTORY.EYEBROW' | translate }}</p>
+      <h2>{{ 'HISTORY.TITLE' | translate }}</h2>
+    </div>
+    <button class="app-action-btn" type="button" (click)="applyFilters()" [disabled]="isLoading || !selectedZoneId">
+      <mat-icon>filter_list</mat-icon>
+      {{ 'HISTORY.FILTER' | translate }}
+    </button>
+  </header>
+
+  <div class="history-content">
+    <div class="history-filters surface-card">
+      <label>
+        <span>{{ 'HISTORY.ZONE' | translate }}</span>
+        <select [(ngModel)]="selectedZoneId" (change)="applyFilters()">
+          <option *ngFor="let zone of zones" [value]="zone.id">{{ getZoneName(zone) }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>{{ 'HISTORY.START_DATE' | translate }}</span>
+        <input type="date" [(ngModel)]="startDate" (change)="applyFilters()">
+      </label>
+
+      <label>
+        <span>{{ 'HISTORY.END_DATE' | translate }}</span>
+        <input type="date" [(ngModel)]="endDate" (change)="applyFilters()">
+      </label>
+
+      <label>
+        <span>{{ 'HISTORY.DATA_TYPE' | translate }}</span>
+        <select [(ngModel)]="selectedType" (change)="applyFilters()">
+          <option *ngFor="let type of sensorTypes" [value]="type">{{ getTypeLabel(type) | translate }}</option>
+        </select>
+      </label>
+
+      <button class="history-reset-btn" type="button" (click)="resetFilters()" [disabled]="isLoading">
+        {{ 'HISTORY.RESET' | translate }}
+      </button>
+    </div>
+
+    <div class="history-summary">
+      <div class="history-summary-chip">
+        <span class="history-summary-chip-dot" style="background:#22c55e"></span>
+        <span class="history-summary-chip-label">{{ 'HISTORY.AVERAGE_SOIL' | translate }}</span>
+        <span class="history-summary-chip-value">{{ averageSoil }}%</span>
+      </div>
+      <div class="history-summary-chip">
+        <span class="history-summary-chip-dot" style="background:#f59e0b"></span>
+        <span class="history-summary-chip-label">{{ 'HISTORY.AVG_TEMP' | translate }}</span>
+        <span class="history-summary-chip-value">{{ averageTemperature }}&deg;C</span>
+      </div>
+    </div>
+
+    <div class="history-table-card surface-card">
+      <div class="history-table-top">
+        <div class="history-table-top-title">{{ 'HISTORY.TELEMETRY_LOG' | translate }}</div>
+        <span class="history-table-top-count">{{ 'HISTORY.ENTRIES' | translate:{ count: history.length } }}</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>{{ 'HISTORY.DATE' | translate }}</th>
+            <th>{{ 'HISTORY.TYPE_LABEL' | translate }}</th>
+            <th>{{ 'DASHBOARD.TEMPERATURE' | translate }}</th>
+            <th>{{ 'HISTORY.HUMIDITY' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="!isLoading && !errorMessage && history.length">
+          <tr *ngFor="let h of history">
+            <td class="td-date">{{ h.enregistre_le | date:'medium' }}</td>
+            <td>{{ getTypeLabel(h.metric_type || selectedType) | translate }}</td>
+            <td>
+              <span class="td-temp">{{ h.temperature }}&deg;C</span>
+            </td>
+            <td>
+              <div class="td-humidity-bar">
+                <div class="mini-bar-track">
+                  <div class="mini-bar-fill" [style.width]="getMetricValue(h) + '%' "></div>
+                </div>
+                <span>{{ getMetricValue(h) }}{{ getMetricUnit() }}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="history-state" *ngIf="isLoading">
+        <mat-icon>sync</mat-icon>
+        {{ 'HISTORY.LOADING' | translate }}
+      </div>
+
+      <div class="history-state error" *ngIf="!isLoading && errorMessage">
+        <mat-icon>error_outline</mat-icon>
+        {{ errorMessage | translate }}
+      </div>
+
+      <div class="history-state" *ngIf="!isLoading && !errorMessage && !history.length">
+        <mat-icon>inbox</mat-icon>
+        {{ 'HISTORY.EMPTY' | translate }}
+      </div>
+    </div>
+  </div>
+</section>

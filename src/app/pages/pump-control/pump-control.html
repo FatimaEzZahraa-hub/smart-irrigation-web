@@ -1,0 +1,57 @@
+<section class="pump-page page-content">
+  <header class="page-toolbar">
+    <div>
+      <p class="page-eyebrow">{{ 'PUMP.EYEBROW' | translate }}</p>
+      <h2>{{ 'NAV.PUMP_CONTROL' | translate }}</h2>
+    </div>
+  </header>
+
+  <div class="pump-page-body">
+    <div class="pump-card surface-card" [class.is-on]="status === 'ON'">
+      <div class="pump-card-icon">
+        <mat-icon>water_drop</mat-icon>
+      </div>
+      <h1 class="pump-card-title">{{ 'PUMP.WATER_PUMP' | translate }}</h1>
+
+      <div class="pump-status-display" [class.on]="status === 'ON'" [class.off]="status === 'OFF'">
+        <div class="pump-status-indicator" [class.on]="status === 'ON'" [class.off]="status === 'OFF'">
+          <span class="dot"></span>
+        </div>
+        <div>
+          <div class="pump-status-label" [class.on]="status === 'ON'" [class.off]="status === 'OFF'">
+            {{ status }}
+          </div>
+          <div class="pump-status-sublabel">
+            {{ (status === 'ON' ? 'PUMP.RUNNING' : 'PUMP.IDLE') | translate }}
+          </div>
+        </div>
+      </div>
+
+      <div class="pump-btns">
+        <button class="pump-btn pump-btn-on app-action-btn primary" (click)="turnOn()">
+          <mat-icon>play_arrow</mat-icon>
+          {{ 'PUMP.TURN_ON' | translate }}
+        </button>
+        <button class="pump-btn pump-btn-off app-action-btn danger" (click)="turnOff()">
+          <mat-icon>stop</mat-icon>
+          {{ 'PUMP.TURN_OFF' | translate }}
+        </button>
+      </div>
+
+      <div class="pump-info-row">
+        <div class="pump-info-item">
+          <div class="pump-info-value">Zone A</div>
+          <div class="pump-info-label">{{ 'PUMP.ZONE' | translate }}</div>
+        </div>
+        <div class="pump-info-item">
+          <div class="pump-info-value">{{ 'PUMP.MANUAL' | translate }}</div>
+          <div class="pump-info-label">{{ 'PUMP.MODE' | translate }}</div>
+        </div>
+        <div class="pump-info-item">
+          <div class="pump-info-value">ESP32</div>
+          <div class="pump-info-label">{{ 'PUMP.DEVICE' | translate }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
