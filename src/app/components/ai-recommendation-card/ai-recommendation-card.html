@@ -1,0 +1,69 @@
+<article class="surface-card ai-recommendation-card" [ngClass]="state === 'ready' ? toneClass : 'neutral'">
+  <div class="ai-card-header">
+    <span class="ai-card-icon"><mat-icon>{{ state === 'ready' ? actionIcon : 'psychology' }}</mat-icon></span>
+    <div class="ai-card-heading">
+      <p class="ai-card-eyebrow">Recommandation IA</p>
+      <h3>{{ state === 'ready' ? recommendation?.recommendation : 'Analyse intelligente' }}</h3>
+    </div>
+  </div>
+
+  <ng-container [ngSwitch]="state">
+
+    <div *ngSwitchCase="'idle'" class="ai-card-empty">
+      <mat-icon>info</mat-icon>
+      <span>Sélectionnez une zone pour afficher la recommandation IA.</span>
+    </div>
+
+    <div *ngSwitchCase="'loading'" class="ai-card-loading">
+      <div class="skeleton ai-skeleton-line" style="width: 90%"></div>
+      <div class="skeleton ai-skeleton-line" style="width: 65%"></div>
+      <div class="skeleton ai-skeleton-line ai-skeleton-bar"></div>
+    </div>
+
+    <div *ngSwitchCase="'error'" class="ai-card-empty error">
+      <mat-icon>cloud_off</mat-icon>
+      <span>Recommandation IA indisponible pour le moment. Réessayez plus tard.</span>
+    </div>
+
+    <div *ngSwitchCase="'ready'" class="ai-card-body">
+      <p class="ai-card-explanation">{{ recommendation?.explanation }}</p>
+
+      <div class="ai-card-confidence">
+        <div class="ai-card-confidence-label">
+          <span>
+            Confiance de l'IA
+            <mat-icon
+              class="ai-info-icon"
+              matTooltip="Score calculé à partir de l'humidité du sol, de la météo et de l'historique de la pompe."
+              matTooltipPosition="above"
+              matTooltipClass="app-tooltip"
+              aria-label="À propos du score de confiance"
+            >info</mat-icon>
+          </span>
+          <strong>{{ confidenceValue }}%</strong>
+        </div>
+        <div class="ai-confidence-track">
+          <div class="ai-confidence-fill" [style.width.%]="confidenceValue"></div>
+        </div>
+      </div>
+
+      <div class="ai-card-facts">
+        <div class="ai-fact">
+          <mat-icon>schedule</mat-icon>
+          <div>
+            <span>Durée estimée</span>
+            <strong>{{ durationLabel }}</strong>
+          </div>
+        </div>
+        <div class="ai-fact">
+          <mat-icon>eco</mat-icon>
+          <div>
+            <span>Conseil d'économie d'eau</span>
+            <strong>{{ recommendation?.waterSavingAdvice }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</article>

@@ -333,7 +333,11 @@
       "SOIL_MOISTURE": "Indique la quantite d'eau disponible dans le sol. Des valeurs faibles peuvent necessiter une irrigation, tandis que des valeurs optimales indiquent une humidite suffisante.",
       "PUMP_STATUS": "Indique l'etat actuel du systeme d'irrigation. En marche signifie que l'eau est en cours de distribution.",
       "WEATHER": "Conditions meteorologiques locales de votre ferme, utilisees pour aider a decider si une irrigation est necessaire aujourd'hui.",
-      "AI_RECOMMENDATION": "Fournit des conseils d'irrigation intelligents bases sur les conditions actuelles de la ferme."
+      "AI_RECOMMENDATION": "Fournit des conseils d'irrigation intelligents bases sur les conditions actuelles de la ferme.",
+      "PLANT": "Represente la culture assignee a cette zone d'irrigation.",
+      "GROWTH_STAGE": "Aide a optimiser les recommandations d'irrigation selon le developpement de la plante.",
+      "IRRIGATION_MODE": "Le mode automatique laisse le systeme gerer l'irrigation. Le mode manuel necessite un controle par l'utilisateur.",
+      "NEXT_IRRIGATION": "Indique la prochaine irrigation prevue selon la configuration actuelle."
     },
     "SOIL": {
       "CURRENT_TITLE": "Capteur du sol",
@@ -358,6 +362,36 @@
   },
   "PUMP": {
     "EYEBROW": "Gestion de l'irrigation",
+    "PAGE_TITLE": "Centre de controle de l'irrigation",
+    "SYSTEM_STATUS": {
+      "READY": "Systeme pret",
+      "OFFLINE": "Appareil hors ligne",
+      "CONNECTION_ISSUE": "Probleme de connexion"
+    },
+    "ESP32_CONNECTION": "Connexion ESP32",
+    "REASON_MANUAL_ON": "Demarree manuellement par vous",
+    "REASON_AUTO_ON": "Demarree automatiquement - l'humidite du sol est sous le seuil",
+    "REASON_MANUAL_OFF": "Arretee manuellement par vous",
+    "REASON_AUTO_OFF": "Arretee automatiquement par le systeme d'irrigation",
+    "REASON_SAFETY_OFF": "Arretee automatiquement par securite (duree maximale d'arrosage atteinte)",
+    "REASON_NONE": "Aucune activite de pompe enregistree",
+    "MANUAL_OVERRIDE_NOTE": "Les actions manuelles s'appliquent immediatement, meme lorsque le mode automatique est active.",
+    "AUTO_LOGIC_TITLE": "Fonctionnement de l'irrigation automatique",
+    "AUTO_LOGIC_STEP_CHECK": "Verifier l'humidite du sol",
+    "AUTO_LOGIC_STEP_COMPARE": "Comparer au seuil",
+    "AUTO_LOGIC_STEP_START": "Demarrer la pompe automatiquement",
+    "AUTO_LOGIC_EXPLANATION": "Si l'humidite du sol descend sous {{threshold}}%, la pompe demarre automatiquement et fonctionne pendant {{duration}} minutes.",
+    "AUTO_LOGIC_DISABLED_NOTE": "Le mode automatique est actuellement desactive - le systeme ne demarrera pas la pompe de lui-meme.",
+    "TOOLTIPS": {
+      "PUMP_STATUS": "Indique si la pompe est en marche ou arretee, et ce qui a declenche le dernier changement.",
+      "SOIL_MOISTURE": "La derniere mesure d'humidite du sol du capteur ESP32, comparee a votre seuil configure.",
+      "IRRIGATION_MODE": "Le mode automatique laisse le systeme demarrer et arreter la pompe de lui-meme. Le mode manuel necessite votre controle.",
+      "ESP32_CONNECTION": "Indique si l'appareil ESP32 envoie activement des donnees, et la date de son dernier rapport.",
+      "MIN_HUMIDITY": "Le niveau d'humidite du sol en dessous duquel l'irrigation automatique demarre.",
+      "IRRIGATION_DURATION": "La duree de fonctionnement de la pompe a chaque demarrage, manuel ou automatique.",
+      "PLANT_NAME": "La culture cultivee dans cette zone. Utilise pour identifier votre tableau de bord et vos rapports.",
+      "PLANTING_DATE": "La date de plantation de cette culture. Utilisee pour estimer son stade de croissance actuel."
+    },
     "WATER_PUMP": "Pompe a eau",
     "HEADER_DESCRIPTION": "Suivez l'etat de la pompe et choisissez comment arroser cette zone.",
     "CURRENT_PUMP_STATUS": "Etat de la pompe",

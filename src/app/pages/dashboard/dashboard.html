@@ -214,7 +214,11 @@
       </div>
     </article>
   </section>
-  
+
+  <section class="ai-recommendation-section">
+    <app-ai-recommendation-card [deviceId]="selectedZoneId"></app-ai-recommendation-card>
+  </section>
+
   <!-- Farm Summary: moved to bottom to serve as final overview -->
   <section class="farm-summary-card surface-card">
     <div class="farm-summary-header">
@@ -234,7 +238,9 @@
       </div>
       <div class="crop-health-wrap">
         <span class="crop-health-badge" [ngClass]="cropHealthClass">
-          <span class="crop-health-dot"></span>
+          <mat-icon class="crop-health-icon" aria-hidden="true" *ngIf="cropHealthClass === 'critical'">error</mat-icon>
+          <mat-icon class="crop-health-icon" aria-hidden="true" *ngIf="cropHealthClass === 'attention'">warning</mat-icon>
+          <mat-icon class="crop-health-icon" aria-hidden="true" *ngIf="cropHealthClass === 'good'">check_circle</mat-icon>
           {{ cropHealthKey | translate }}
         </span>
         <button
@@ -249,43 +255,75 @@
     </div>
 
     <div class="farm-summary-facts">
-      <div class="fact-chip">
+      <article class="fact-chip">
+        <button
+          type="button"
+          class="info-icon fact-chip-info"
+          [matTooltip]="'DASHBOARD.TOOLTIPS.PLANT' | translate"
+          matTooltipPosition="above"
+          matTooltipClass="app-tooltip"
+          [attr.aria-label]="'DASHBOARD.TOOLTIPS.PLANT' | translate"
+        ><mat-icon aria-hidden="true">info</mat-icon></button>
         <span class="fact-chip-icon"><mat-icon>eco</mat-icon></span>
-        <div>
-          <span>{{ 'DASHBOARD.SUMMARY.PLANT' | translate }}</span>
-          <strong>{{ deviceSettings?.plantName || ('DASHBOARD.SUMMARY.PLANT_NOT_SET' | translate) }}</strong>
+        <div class="fact-chip-body">
+          <span class="fact-chip-label">{{ 'DASHBOARD.SUMMARY.PLANT' | translate }}</span>
+          <strong class="fact-chip-value">{{ deviceSettings?.plantName || ('DASHBOARD.SUMMARY.PLANT_NOT_SET' | translate) }}</strong>
         </div>
-      </div>
+      </article>
 
-      <div class="fact-chip">
+      <article class="fact-chip">
+        <button
+          type="button"
+          class="info-icon fact-chip-info"
+          [matTooltip]="'DASHBOARD.TOOLTIPS.GROWTH_STAGE' | translate"
+          matTooltipPosition="above"
+          matTooltipClass="app-tooltip"
+          [attr.aria-label]="'DASHBOARD.TOOLTIPS.GROWTH_STAGE' | translate"
+        ><mat-icon aria-hidden="true">info</mat-icon></button>
         <span class="fact-chip-icon"><mat-icon>timeline</mat-icon></span>
-        <div>
-          <span>{{ 'DASHBOARD.SUMMARY.GROWTH_STAGE' | translate }}</span>
-          <strong>{{ growthStageKey | translate }}</strong>
+        <div class="fact-chip-body">
+          <span class="fact-chip-label">{{ 'DASHBOARD.SUMMARY.GROWTH_STAGE' | translate }}</span>
+          <strong class="fact-chip-value">{{ growthStageKey | translate }}</strong>
         </div>
-      </div>
+      </article>
 
-      <div class="fact-chip">
+      <article class="fact-chip">
+        <button
+          type="button"
+          class="info-icon fact-chip-info"
+          [matTooltip]="'DASHBOARD.TOOLTIPS.IRRIGATION_MODE' | translate"
+          matTooltipPosition="above"
+          matTooltipClass="app-tooltip"
+          [attr.aria-label]="'DASHBOARD.TOOLTIPS.IRRIGATION_MODE' | translate"
+        ><mat-icon aria-hidden="true">info</mat-icon></button>
         <span class="fact-chip-icon"><mat-icon>tune</mat-icon></span>
-        <div>
-          <span>{{ 'DASHBOARD.SUMMARY.IRRIGATION_MODE' | translate }}</span>
-          <strong>{{ irrigationModeKey | translate }}</strong>
+        <div class="fact-chip-body">
+          <span class="fact-chip-label">{{ 'DASHBOARD.SUMMARY.IRRIGATION_MODE' | translate }}</span>
+          <strong class="fact-chip-value">{{ irrigationModeKey | translate }}</strong>
         </div>
-      </div>
+      </article>
 
-      <div class="fact-chip" [ngClass]="nextIrrigationClass">
+      <article class="fact-chip" [ngClass]="nextIrrigationClass">
+        <button
+          type="button"
+          class="info-icon fact-chip-info"
+          [matTooltip]="'DASHBOARD.TOOLTIPS.NEXT_IRRIGATION' | translate"
+          matTooltipPosition="above"
+          matTooltipClass="app-tooltip"
+          [attr.aria-label]="'DASHBOARD.TOOLTIPS.NEXT_IRRIGATION' | translate"
+        ><mat-icon aria-hidden="true">info</mat-icon></button>
         <span class="fact-chip-icon"><mat-icon>schedule</mat-icon></span>
-        <div>
-          <span>{{ 'DASHBOARD.SUMMARY.NEXT_IRRIGATION' | translate }}</span>
-          <strong>{{ nextIrrigationKey | translate }}</strong>
+        <div class="fact-chip-body">
+          <span class="fact-chip-label">{{ 'DASHBOARD.SUMMARY.NEXT_IRRIGATION' | translate }}</span>
+          <strong class="fact-chip-value">{{ nextIrrigationKey | translate }}</strong>
         </div>
-      </div>
+      </article>
     </div>
 
     <div class="ai-recommendation-banner" [ngClass]="cropHealthClass">
       <span class="ai-recommendation-icon"><mat-icon>psychology</mat-icon></span>
-      <div>
-        <span>
+      <div class="ai-recommendation-body">
+        <span class="ai-recommendation-label">
           {{ 'DASHBOARD.SUMMARY.AI_RECOMMENDATION' | translate }}
           <button
             type="button"

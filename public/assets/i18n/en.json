@@ -333,7 +333,11 @@
       "SOIL_MOISTURE": "Shows the amount of available water in the soil. Low values may require irrigation, while optimal values indicate sufficient moisture.",
       "PUMP_STATUS": "Indicates the current irrigation system state. Running means water is currently being supplied.",
       "WEATHER": "Local weather conditions for your farm, used to help decide whether irrigation is needed today.",
-      "AI_RECOMMENDATION": "Provides intelligent irrigation advice based on current farm conditions."
+      "AI_RECOMMENDATION": "Provides intelligent irrigation advice based on current farm conditions.",
+      "PLANT": "Represents the crop assigned to this irrigation zone.",
+      "GROWTH_STAGE": "Helps optimize irrigation recommendations according to plant development.",
+      "IRRIGATION_MODE": "Automatic mode lets the system manage irrigation. Manual mode requires user control.",
+      "NEXT_IRRIGATION": "Shows the next planned irrigation based on the current configuration."
     },
     "SOIL": {
       "CURRENT_TITLE": "Soil sensor",
@@ -358,6 +362,36 @@
   },
   "PUMP": {
     "EYEBROW": "Irrigation control",
+    "PAGE_TITLE": "Irrigation Control Center",
+    "SYSTEM_STATUS": {
+      "READY": "System Ready",
+      "OFFLINE": "Device Offline",
+      "CONNECTION_ISSUE": "Connection problem"
+    },
+    "ESP32_CONNECTION": "ESP32 connection",
+    "REASON_MANUAL_ON": "Started manually by you",
+    "REASON_AUTO_ON": "Started automatically - soil moisture is below the threshold",
+    "REASON_MANUAL_OFF": "Stopped manually by you",
+    "REASON_AUTO_OFF": "Stopped automatically by the irrigation system",
+    "REASON_SAFETY_OFF": "Stopped automatically for safety (maximum watering time reached)",
+    "REASON_NONE": "No pump activity recorded yet",
+    "MANUAL_OVERRIDE_NOTE": "Manual actions apply immediately, even while automatic mode is enabled.",
+    "AUTO_LOGIC_TITLE": "How automatic irrigation works",
+    "AUTO_LOGIC_STEP_CHECK": "Check soil moisture",
+    "AUTO_LOGIC_STEP_COMPARE": "Compare to threshold",
+    "AUTO_LOGIC_STEP_START": "Start pump automatically",
+    "AUTO_LOGIC_EXPLANATION": "If soil moisture drops below {{threshold}}%, the pump starts automatically and runs for {{duration}} minutes.",
+    "AUTO_LOGIC_DISABLED_NOTE": "Automatic mode is currently off - the system will not start the pump on its own.",
+    "TOOLTIPS": {
+      "PUMP_STATUS": "Shows whether the pump is currently running or stopped, and what triggered the last change.",
+      "SOIL_MOISTURE": "The most recent soil moisture reading from the ESP32 sensor, compared to your configured threshold.",
+      "IRRIGATION_MODE": "Automatic mode lets the system start and stop the pump on its own. Manual mode requires you to control it.",
+      "ESP32_CONNECTION": "Shows whether the ESP32 device is actively sending data, and when it last reported.",
+      "MIN_HUMIDITY": "The soil moisture level below which automatic irrigation starts.",
+      "IRRIGATION_DURATION": "How long the pump runs each time it starts, whether manually or automatically.",
+      "PLANT_NAME": "The crop grown in this zone. Used to label your dashboard and reports.",
+      "PLANTING_DATE": "The date this crop was planted. Used to estimate its current growth stage."
+    },
     "WATER_PUMP": "Water pump",
     "HEADER_DESCRIPTION": "Check the pump status and choose how this zone is watered.",
     "CURRENT_PUMP_STATUS": "Pump status",

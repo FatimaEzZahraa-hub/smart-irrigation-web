@@ -13,6 +13,7 @@ import { PumpService } from '../../services/pump.service';
 import { ZoneStateService } from '../../services/zone-state.service';
 import { AlertStateService, IrrigationAlert } from '../../services/alert-state.service';
 import { Sensor } from '../../models/sensor';
+import { AiRecommendationCard } from '../../components/ai-recommendation-card/ai-recommendation-card';
 
 const SEVERITY_COLORS: Record<IrrigationAlert['severity'], string> = {
   critical: '#ef4444',
@@ -33,7 +34,8 @@ const SEVERITY_ORDER: Record<IrrigationAlert['severity'], number> = {
     CommonModule,
     MatIconModule,
     MatTooltipModule,
-    TranslatePipe
+    TranslatePipe,
+    AiRecommendationCard
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'

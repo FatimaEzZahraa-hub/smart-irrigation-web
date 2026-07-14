@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
@@ -23,7 +24,7 @@ interface ConfirmRequest {
 @Component({
   selector: 'app-pump-control',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, MatIconModule, MatTooltipModule, TranslatePipe],
   templateUrl: './pump-control.html',
   styleUrl: './pump-control.css'
 })
@@ -35,6 +36,7 @@ export class PumpControl implements OnInit {
   irrigationDuration = 10;
   plantName = '';
   plantingDate = '';
+  zoneName = '';
   feedbackKey = '';
   feedbackType: 'success' | 'error' = 'success';
 
@@ -120,6 +122,51 @@ export class PumpControl implements OnInit {
     return this.pumpHistory.slice(0, 6);
   }
 
+  get systemStatusClass(): 'ready' | 'offline' | 'connection-issue' {
+    const isConnectionError =
+      this.feedbackType === 'error' &&
+      (this.feedbackKey === 'PUMP.ERROR_LOAD' ||
+        this.feedbackKey === 'PUMP.ERROR_NETWORK' ||
+        this.feedbackKey === 'PUMP.ERROR_NO_DEVICE');
+
+    if (isConnectionError) {
+      return 'connection-issue';
+    }
+    if (!this.isDeviceOnline) {
+      return 'offline';
+    }
+    return 'ready';
+  }
+
+  get systemStatusKey(): string {
+    switch (this.systemStatusClass) {
+      case 'connection-issue':
+        return 'PUMP.SYSTEM_STATUS.CONNECTION_ISSUE';
+      case 'offline':
+        return 'PUMP.SYSTEM_STATUS.OFFLINE';
+      default:
+        return 'PUMP.SYSTEM_STATUS.READY';
+    }
+  }
+
+  get pumpReasonKey(): string {
+    const latest = this.pumpHistory[0];
+    if (!latest) {
+      return 'PUMP.REASON_NONE';
+    }
+
+    const trigger = latest.triggered_by ?? latest.declenche_par;
+    const isOn = latest.action === 'ON';
+
+    if (trigger === 'automatic') {
+      return isOn ? 'PUMP.REASON_AUTO_ON' : 'PUMP.REASON_AUTO_OFF';
+    }
+    if (trigger === 'system') {
+      return isOn ? 'PUMP.REASON_MANUAL_ON' : 'PUMP.REASON_SAFETY_OFF';
+    }
+    return isOn ? 'PUMP.REASON_MANUAL_ON' : 'PUMP.REASON_MANUAL_OFF';
+  }
+
   triggeredByKey(entry: any): string {
     const value = entry?.triggered_by ?? entry?.declenche_par;
     if (value === 'automatic') {
@@ -129,6 +176,17 @@ export class PumpControl implements OnInit {
       return 'PUMP.TRIGGERED_SAFETY';
     }
     return 'PUMP.TRIGGERED_MANUAL';
+  }
+
+  triggerIcon(entry: any): string {
+    const value = entry?.triggered_by ?? entry?.declenche_par;
+    if (value === 'automatic') {
+      return 'auto_mode';
+    }
+    if (value === 'system') {
+      return 'shield';
+    }
+    return 'pan_tool';
   }
 
   eventDate(entry: any): Date | null {
@@ -186,6 +244,7 @@ export class PumpControl implements OnInit {
       next: () => {
         this.status = 'ON';
         this.lastActivation = new Date();
+        this.pushHistoryEntry('ON');
         this.showFeedback('PUMP.CONFIRM_PUMP_ON');
       },
       error: (err) => {
@@ -202,6 +261,7 @@ export class PumpControl implements OnInit {
     ).subscribe({
       next: () => {
         this.status = 'OFF';
+        this.pushHistoryEntry('OFF');
         this.showFeedback('PUMP.CONFIRM_PUMP_OFF');
       },
       error: (err) => {
@@ -302,6 +362,7 @@ export class PumpControl implements OnInit {
         if (device?.mode) {
           this.automaticMode = device.mode === 'auto';
         }
+        this.zoneName = (device as any)?.nom || (device as any)?.emplacement || '';
 
         if (settings) {
           this.humidityThreshold = settings.humidityThreshold ?? 40;
@@ -342,5 +403,13 @@ export class PumpControl implements OnInit {
 
   private clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(Number(value) || min, min), max);
+  }
+
+  private pushHistoryEntry(action: 'ON' | 'OFF'): void {
+    const now = new Date().toISOString();
+    this.pumpHistory = [
+      { action, triggered_by: 'manual', declenche_par: 'manual', triggered_at: now, declenche_le: now },
+      ...this.pumpHistory
+    ];
   }
 }
