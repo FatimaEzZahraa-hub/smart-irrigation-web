@@ -1,84 +1,244 @@
 <section class="settings-page page-content">
   <header class="page-toolbar">
     <div>
-      <p class="page-eyebrow">{{ 'SETTINGS.CONFIGURATION' | translate }}</p>
-      <h2>{{ 'NAV.SETTINGS' | translate }}</h2>
+      <p class="page-eyebrow">{{ 'SETTINGS.EYEBROW' | translate }}</p>
+      <h2>{{ 'SETTINGS.PAGE_TITLE' | translate }}</h2>
+      <p class="settings-subtitle">{{ 'SETTINGS.PAGE_SUBTITLE' | translate }}</p>
     </div>
   </header>
 
-  <div class="settings-card surface-card">
+  <!-- Tab navigation -->
+  <nav class="settings-tabs">
+    <button
+      class="settings-tab-btn"
+      [class.active]="activeTab === 'profile'"
+      type="button"
+      (click)="setTab('profile')"
+    >
+      <mat-icon>person</mat-icon>
+      {{ 'SETTINGS.TAB.PROFILE' | translate }}
+    </button>
+    <button
+      class="settings-tab-btn"
+      [class.active]="activeTab === 'security'"
+      type="button"
+      (click)="setTab('security')"
+    >
+      <mat-icon>lock</mat-icon>
+      {{ 'SETTINGS.TAB.SECURITY' | translate }}
+    </button>
+    <button
+      class="settings-tab-btn"
+      [class.active]="activeTab === 'language'"
+      type="button"
+      (click)="setTab('language')"
+    >
+      <mat-icon>language</mat-icon>
+      {{ 'SETTINGS.TAB.LANGUAGE' | translate }}
+    </button>
+  </nav>
+
+  <!-- ── PROFILE TAB ─────────────────────────────────────── -->
+  <div class="settings-card surface-card" *ngIf="activeTab === 'profile'">
     <div class="settings-card-header">
       <div class="settings-icon profile">
         <mat-icon>person</mat-icon>
       </div>
       <div>
-        <p class="settings-eyebrow">{{ 'PROFILE.EYEBROW' | translate }}</p>
-        <h1>{{ 'PROFILE.ACCOUNT_TITLE' | translate }}</h1>
+        <p class="settings-eyebrow">{{ 'SETTINGS.PROFILE_EYEBROW' | translate }}</p>
+        <h3>{{ 'SETTINGS.PROFILE_TITLE' | translate }}</h3>
       </div>
     </div>
 
-    <div class="profile-state-card" *ngIf="isLoadingProfile">
+    <!-- Loading / Error states -->
+    <div class="settings-state-card" *ngIf="isLoadingProfile">
       <mat-icon>sync</mat-icon>
       {{ 'PROFILE.LOADING' | translate }}
     </div>
-
-    <div class="profile-state-card error" *ngIf="!isLoadingProfile && profileError">
+    <div class="settings-state-card error" *ngIf="!isLoadingProfile && profileError">
       <mat-icon>error_outline</mat-icon>
       {{ profileError | translate }}
     </div>
 
-    <div class="profile-grid" *ngIf="!isLoadingProfile && !profileError && user">
-      <div class="profile-field">
-        <span>{{ 'PROFILE.FULL_NAME' | translate }}</span>
-        <strong>{{ user.fullName }}</strong>
+    <!-- Profile form -->
+    <ng-container *ngIf="!isLoadingProfile && !profileError">
+      <div class="settings-item">
+        <label for="fullName">{{ 'PROFILE.FULL_NAME' | translate }}</label>
+        <div class="settings-input-wrap">
+          <mat-icon class="input-icon">badge</mat-icon>
+          <input
+            id="fullName"
+            type="text"
+            [(ngModel)]="profileForm.fullName"
+            [placeholder]="'SETTINGS.FULL_NAME_PLACEHOLDER' | translate"
+          />
+        </div>
       </div>
-      <div class="profile-field">
-        <span>{{ 'PROFILE.EMAIL' | translate }}</span>
-        <strong>{{ user.email }}</strong>
+
+      <div class="settings-item">
+        <label for="email">{{ 'PROFILE.EMAIL' | translate }}</label>
+        <div class="settings-input-wrap">
+          <mat-icon class="input-icon">email</mat-icon>
+          <input
+            id="email"
+            type="email"
+            [(ngModel)]="profileForm.email"
+            [placeholder]="'SETTINGS.EMAIL_PLACEHOLDER' | translate"
+          />
+        </div>
       </div>
-      <div class="profile-field" *ngIf="user.role">
-        <span>{{ 'PROFILE.ROLE' | translate }}</span>
-        <strong>{{ user.role }}</strong>
+
+      <div class="settings-feedback success" *ngIf="profileSaved">
+        <mat-icon>check_circle</mat-icon>
+        {{ 'SETTINGS.SAVED_SUCCESS' | translate }}
       </div>
-      <div class="profile-field" *ngIf="user.createdAt">
-        <span>{{ 'PROFILE.CREATED_AT' | translate }}</span>
-        <strong>{{ user.createdAt | date:'mediumDate' }}</strong>
+      <div class="settings-feedback error" *ngIf="profileSaveError">
+        <mat-icon>error_outline</mat-icon>
+        {{ profileSaveError | translate }}
       </div>
-    </div>
+
+      <button
+        class="settings-save-btn"
+        type="button"
+        [disabled]="profileSaving"
+        (click)="saveProfile()"
+      >
+        <mat-icon>{{ profileSaving ? 'sync' : 'save' }}</mat-icon>
+        {{ (profileSaving ? 'SETTINGS.SAVING' : 'SETTINGS.SAVE') | translate }}
+      </button>
+    </ng-container>
   </div>
 
-  <div class="settings-card surface-card">
+  <!-- ── SECURITY TAB ────────────────────────────────────── -->
+  <div class="settings-card surface-card" *ngIf="activeTab === 'security'">
     <div class="settings-card-header">
-      <div class="settings-icon">
-        <mat-icon>settings</mat-icon>
+      <div class="settings-icon security">
+        <mat-icon>lock</mat-icon>
       </div>
       <div>
-        <p class="settings-eyebrow">{{ 'SETTINGS.CONFIGURATION' | translate }}</p>
-        <h1>{{ 'SETTINGS.DEVICE_SETTINGS' | translate }}</h1>
+        <p class="settings-eyebrow">{{ 'SETTINGS.SECURITY_EYEBROW' | translate }}</p>
+        <h3>{{ 'SETTINGS.SECURITY_TITLE' | translate }}</h3>
       </div>
     </div>
 
     <div class="settings-item">
-      <label>{{ 'SETTINGS.DEVICE_NAME' | translate }}</label>
-      <input type="text" [placeholder]="'SETTINGS.DEVICE_PLACEHOLDER' | translate">
+      <label for="currentPwd">{{ 'SETTINGS.CURRENT_PASSWORD' | translate }}</label>
+      <div class="settings-input-wrap">
+        <mat-icon class="input-icon">lock_outline</mat-icon>
+        <input
+          id="currentPwd"
+          [type]="showCurrentPassword ? 'text' : 'password'"
+          [(ngModel)]="securityForm.currentPassword"
+          [placeholder]="'SETTINGS.CURRENT_PASSWORD_PLACEHOLDER' | translate"
+        />
+        <button class="toggle-password" type="button" (click)="showCurrentPassword = !showCurrentPassword">
+          <mat-icon>{{ showCurrentPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
     </div>
 
     <div class="settings-item">
-      <label>{{ 'SETTINGS.LOCATION' | translate }}</label>
-      <input type="text" [placeholder]="'SETTINGS.LOCATION_PLACEHOLDER' | translate">
+      <label for="newPwd">{{ 'SETTINGS.NEW_PASSWORD' | translate }}</label>
+      <div class="settings-input-wrap">
+        <mat-icon class="input-icon">lock_reset</mat-icon>
+        <input
+          id="newPwd"
+          [type]="showNewPassword ? 'text' : 'password'"
+          [(ngModel)]="securityForm.newPassword"
+          [placeholder]="'SETTINGS.NEW_PASSWORD_PLACEHOLDER' | translate"
+        />
+        <button class="toggle-password" type="button" (click)="showNewPassword = !showNewPassword">
+          <mat-icon>{{ showNewPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+      <p class="settings-hint" *ngIf="securityForm.newPassword && securityForm.newPassword.length < 8">
+        {{ 'SETTINGS.PASSWORD_MIN' | translate }}
+      </p>
     </div>
 
     <div class="settings-item">
-      <label>{{ 'SETTINGS.IRRIGATION_MODE' | translate }}</label>
-      <select>
-        <option>{{ 'SETTINGS.AUTO' | translate }}</option>
-        <option>{{ 'PUMP.MANUAL' | translate }}</option>
-      </select>
+      <label for="confirmPwd">{{ 'SETTINGS.CONFIRM_PASSWORD' | translate }}</label>
+      <div class="settings-input-wrap" [class.input-error]="securityForm.confirmPassword && !passwordsMatch">
+        <mat-icon class="input-icon">check_circle_outline</mat-icon>
+        <input
+          id="confirmPwd"
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          [(ngModel)]="securityForm.confirmPassword"
+          [placeholder]="'SETTINGS.CONFIRM_PASSWORD_PLACEHOLDER' | translate"
+        />
+        <button class="toggle-password" type="button" (click)="showConfirmPassword = !showConfirmPassword">
+          <mat-icon>{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </div>
+      <p class="settings-hint error" *ngIf="securityForm.confirmPassword && !passwordsMatch">
+        {{ 'SETTINGS.PASSWORDS_MISMATCH' | translate }}
+      </p>
     </div>
 
-    <button class="settings-save-btn" type="button">
-      <mat-icon>save</mat-icon>
-      {{ 'SETTINGS.SAVE' | translate }}
+    <div class="settings-feedback success" *ngIf="securitySaved">
+      <mat-icon>check_circle</mat-icon>
+      {{ 'SETTINGS.PASSWORD_CHANGED' | translate }}
+    </div>
+    <div class="settings-feedback error" *ngIf="securityError">
+      <mat-icon>error_outline</mat-icon>
+      {{ securityError | translate }}
+    </div>
+
+    <button
+      class="settings-save-btn"
+      type="button"
+      [disabled]="securitySaving || !securityFormValid"
+      (click)="savePassword()"
+    >
+      <mat-icon>{{ securitySaving ? 'sync' : 'lock_reset' }}</mat-icon>
+      {{ (securitySaving ? 'SETTINGS.SAVING' : 'SETTINGS.CHANGE_PASSWORD') | translate }}
+    </button>
+  </div>
+
+  <!-- ── LANGUAGE TAB ───────────────────────────────────── -->
+  <div class="settings-card surface-card" *ngIf="activeTab === 'language'">
+    <div class="settings-card-header">
+      <div class="settings-icon lang">
+        <mat-icon>language</mat-icon>
+      </div>
+      <div>
+        <p class="settings-eyebrow">{{ 'SETTINGS.LANGUAGE_EYEBROW' | translate }}</p>
+        <h3>{{ 'SETTINGS.LANGUAGE_TITLE' | translate }}</h3>
+      </div>
+    </div>
+
+    <p class="settings-language-subtitle">{{ 'SETTINGS.LANGUAGE_SUBTITLE' | translate }}</p>
+
+    <div class="settings-language-group">
+      <label
+        class="settings-language-option"
+        *ngFor="let lang of languages"
+        [class.active]="selectedLanguage === lang.code"
+      >
+        <input
+          type="radio"
+          name="language"
+          [value]="lang.code"
+          [(ngModel)]="selectedLanguage"
+        />
+        <mat-icon>language</mat-icon>
+        {{ lang.label }}
+      </label>
+    </div>
+
+    <div class="settings-feedback success" *ngIf="languageSaved">
+      <mat-icon>check_circle</mat-icon>
+      {{ 'SETTINGS.LANGUAGE_SAVED' | translate }}
+    </div>
+
+    <button
+      class="settings-save-btn"
+      type="button"
+      [disabled]="languageSaving"
+      (click)="saveLanguage()"
+    >
+      <mat-icon>{{ languageSaving ? 'sync' : 'language' }}</mat-icon>
+      {{ (languageSaving ? 'SETTINGS.SAVING' : 'SETTINGS.SAVE_LANGUAGE') | translate }}
     </button>
   </div>
 </section>

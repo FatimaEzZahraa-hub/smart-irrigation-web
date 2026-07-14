@@ -1,0 +1,14 @@
+<div class="admin-modal-backdrop" (click)="close.emit()">
+  <div class="admin-modal-panel surface-card" (click)="$event.stopPropagation()">
+    <header class="admin-modal-header">
+      <h3>{{ title }}</h3>
+      <button type="button" class="admin-modal-close" (click)="close.emit()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+
+    <div class="admin-modal-body">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

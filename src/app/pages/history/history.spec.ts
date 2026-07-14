@@ -3,6 +3,7 @@ import { of } from 'rxjs';
 
 import { History } from './history';
 import { DeviceService } from '../../services/device.service';
+import { PumpService } from '../../services/pump.service';
 import { SensorService } from '../../services/sensor.service';
 import { commonTestProviders } from '../../testing/test-providers';
 
@@ -25,6 +26,12 @@ describe('History', () => {
           provide: SensorService,
           useValue: {
             getHistory: () => of([])
+          }
+        },
+        {
+          provide: PumpService,
+          useValue: {
+            history: () => of([])
           }
         }
       ]

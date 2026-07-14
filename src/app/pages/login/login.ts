@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthService } from '../../services/auth.service';
@@ -9,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, MatIconModule, TranslatePipe],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
@@ -17,6 +18,7 @@ export class Login {
   form: FormGroup;
   isLoading = false;
   errorMessage = '';
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -65,7 +67,6 @@ export class Login {
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
-        console.error('Login error:', err);
         this.errorMessage = this.getErrorMessage(err);
         this.isLoading = false;
       }

@@ -39,10 +39,15 @@
       <span class="nav-label">{{ 'NAV.HISTORY' | translate }}</span>
     </a>
 
+    <a routerLink="/analyses" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>insights</mat-icon></span>
+      <span class="nav-label">{{ 'NAV.ANALYSES' | translate }}</span>
+    </a>
+
     <a routerLink="/alerts" routerLinkActive="active">
       <span class="nav-icon"><mat-icon>notifications</mat-icon></span>
       <span class="nav-label">{{ 'NAV.ALERTS' | translate }}</span>
-      <span class="nav-badge">3</span>
+      <span class="nav-badge" *ngIf="alertCount > 0" aria-hidden="true">{{ alertCount > 9 ? '9+' : alertCount }}</span>
     </a>
 
     <div class="sidebar-divider"></div>
@@ -57,12 +62,17 @@
       <span class="nav-icon"><mat-icon>settings</mat-icon></span>
       <span class="nav-label">{{ 'NAV.SETTINGS' | translate }}</span>
     </a>
+
+    <a routerLink="/about" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>info</mat-icon></span>
+      <span class="nav-label">{{ 'NAV.ABOUT' | translate }}</span>
+    </a>
   </nav>
 
   <div class="sidebar-footer">
-    <a routerLink="/login">
+    <button type="button" (click)="logout()">
       <span class="nav-icon"><mat-icon>logout</mat-icon></span>
       <span class="nav-label">{{ 'NAV.LOGOUT' | translate }}</span>
-    </a>
+    </button>
   </div>
 </aside>

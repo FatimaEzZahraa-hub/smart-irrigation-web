@@ -1,0 +1,269 @@
+<section class="analyses-page page-content">
+  <header class="analyses-header page-toolbar">
+    <div>
+      <p class="analyses-eyebrow page-eyebrow">{{ 'ANALYSES.EYEBROW' | translate }}</p>
+      <h2>{{ 'ANALYSES.TITLE' | translate }}</h2>
+      <p class="analyses-subtitle">{{ 'ANALYSES.SUBTITLE' | translate }}</p>
+    </div>
+  </header>
+
+  <section class="analyses-toolbar surface-card">
+    <div class="analyses-periods" role="group" [attr.aria-label]="'ANALYSES.PERIOD_LABEL' | translate">
+      <button
+        *ngFor="let period of periods"
+        type="button"
+        class="analyses-period-btn"
+        [class.is-active]="selectedPeriod === period"
+        (click)="setPeriod(period)"
+      >
+        <mat-icon *ngIf="period === 'custom'">calendar_today</mat-icon>
+        {{ getPeriodLabel(period) | translate }}
+      </button>
+    </div>
+
+    <div class="analyses-toolbar-right">
+      <div class="analyses-custom-dates" *ngIf="selectedPeriod === 'custom'">
+        <input type="date" [(ngModel)]="startDate" (change)="onCustomDateChange()">
+        <span aria-hidden="true">&mdash;</span>
+        <input type="date" [(ngModel)]="endDate" (change)="onCustomDateChange()">
+      </div>
+
+      <button class="analyses-btn analyses-btn-ghost" type="button" (click)="exportPdf()" [disabled]="isLoading || !hasData">
+        <mat-icon>picture_as_pdf</mat-icon>
+        {{ 'ANALYSES.EXPORT_PDF' | translate }}
+      </button>
+      <button class="analyses-btn analyses-btn-primary" type="button" (click)="exportStatistics()" [disabled]="isLoading || !hasData">
+        <mat-icon>download</mat-icon>
+        {{ 'ANALYSES.EXPORT_STATS' | translate }}
+      </button>
+    </div>
+  </section>
+
+  <div class="analyses-loading" *ngIf="isLoading">
+    <mat-icon class="analyses-spinner">sync</mat-icon>
+    <span>{{ 'ANALYSES.LOADING' | translate }}</span>
+  </div>
+
+  <div class="analyses-error" *ngIf="!isLoading && errorMessage">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ errorMessage | translate }}</span>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !errorMessage">
+    <section class="analyses-kpis" [attr.aria-label]="'ANALYSES.KPI_LABEL' | translate">
+      <article class="analyses-kpi surface-card">
+        <div class="analyses-kpi-icon water">
+          <mat-icon>water_drop</mat-icon>
+        </div>
+        <div>
+          <span class="analyses-kpi-label">{{ 'ANALYSES.DAILY_WATER' | translate }}</span>
+          <span class="analyses-kpi-value">{{ formatLiters(stats?.dailyLiters || 0) }}</span>
+        </div>
+      </article>
+
+      <article class="analyses-kpi surface-card">
+        <div class="analyses-kpi-icon weekly">
+          <mat-icon>calendar_view_week</mat-icon>
+        </div>
+        <div>
+          <span class="analyses-kpi-label">{{ 'ANALYSES.WEEKLY_WATER' | translate }}</span>
+          <span class="analyses-kpi-value">{{ formatLiters(stats?.weeklyLiters || 0) }}</span>
+        </div>
+      </article>
+
+      <article class="analyses-kpi surface-card">
+        <div class="analyses-kpi-icon monthly">
+          <mat-icon>calendar_month</mat-icon>
+        </div>
+        <div>
+          <span class="analyses-kpi-label">{{ 'ANALYSES.MONTHLY_WATER' | translate }}</span>
+          <span class="analyses-kpi-value">{{ formatLiters(stats?.monthlyLiters || 0) }}</span>
+        </div>
+      </article>
+
+      <article class="analyses-kpi surface-card">
+        <div class="analyses-kpi-icon time">
+          <mat-icon>schedule</mat-icon>
+        </div>
+        <div>
+          <span class="analyses-kpi-label">{{ 'ANALYSES.TOTAL_IRRIGATION' | translate }}</span>
+          <span class="analyses-kpi-value">{{ formatDuration(stats?.totalIrrigationMs || 0) }}</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="analyses-charts">
+      <article class="analyses-chart-card surface-card">
+        <div class="analyses-chart-header">
+          <div>
+            <h3>{{ 'ANALYSES.HUMIDITY_CHART' | translate }}</h3>
+            <p>{{ 'ANALYSES.HUMIDITY_CHART_DESC' | translate }}</p>
+          </div>
+          <span class="analyses-chart-badge">{{ 'ANALYSES.AVG_HUMIDITY' | translate }}: {{ stats?.averageHumidity || 0 }}%</span>
+        </div>
+        <div class="analyses-chart-canvas">
+          <canvas #humidityCanvas></canvas>
+        </div>
+      </article>
+
+      <article class="analyses-chart-card surface-card">
+        <div class="analyses-chart-header">
+          <div>
+            <h3>{{ 'ANALYSES.WATER_CHART' | translate }}</h3>
+            <p>{{ 'ANALYSES.WATER_CHART_DESC' | translate }}</p>
+          </div>
+        </div>
+        <div class="analyses-chart-canvas">
+          <canvas #waterCanvas></canvas>
+        </div>
+      </article>
+
+      <article class="analyses-chart-card surface-card analyses-chart-wide">
+        <div class="analyses-chart-header">
+          <div>
+            <h3>{{ 'ANALYSES.PUMP_CHART' | translate }}</h3>
+            <p>{{ 'ANALYSES.PUMP_CHART_DESC' | translate }}</p>
+          </div>
+        </div>
+        <div class="analyses-chart-canvas">
+          <canvas #pumpCanvas></canvas>
+        </div>
+      </article>
+    </section>
+
+    <!-- ── Timelines ─────────────────────────────────────────── -->
+    <section class="analyses-charts analyses-timelines-grid">
+
+      <!-- Irrigation Timeline (swimlane) -->
+      <article class="analyses-chart-card surface-card analyses-chart-wide">
+        <div class="analyses-chart-header">
+          <div>
+            <h3>{{ 'ANALYSES.IRRIGATION_TIMELINE' | translate }}</h3>
+            <p>{{ 'ANALYSES.IRRIGATION_TIMELINE_DESC' | translate }}</p>
+          </div>
+          <span class="analyses-chart-badge">
+            {{ pumpSessions.length }} {{ 'ANALYSES.SESSIONS_COUNT' | translate }}
+          </span>
+        </div>
+
+        <div class="analyses-swimlane">
+          <div class="analyses-swimlane-axis">
+            <span>{{ startDate }}</span>
+            <span>{{ endDate }}</span>
+          </div>
+          <div class="analyses-swimlane-track">
+            <span class="analyses-swimlane-empty" *ngIf="pumpSessions.length === 0">
+              {{ 'ANALYSES.NO_SESSIONS' | translate }}
+            </span>
+            <div
+              *ngFor="let s of pumpSessions"
+              class="analyses-swimlane-bar"
+              [class.auto]="s.trigger === 'automatique'"
+              [style.left]="sessionLeft(s)"
+              [style.width]="sessionWidth(s)"
+              [attr.title]="formatDateTime(s.start) + ' → ' + formatDateTime(s.end) + ' (' + formatDuration(s.durationMs) + ')'"
+            ></div>
+          </div>
+          <div class="analyses-swimlane-legend" *ngIf="pumpSessions.length > 0">
+            <span class="analyses-swimlane-legend-item">
+              <span class="analyses-swimlane-dot manual"></span>
+              {{ 'ANALYSES.TRIGGER_MANUAL' | translate }}
+            </span>
+            <span class="analyses-swimlane-legend-item">
+              <span class="analyses-swimlane-dot auto"></span>
+              {{ 'ANALYSES.TRIGGER_AUTO' | translate }}
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Water Consumption Timeline (cumulative line) -->
+      <article class="analyses-chart-card surface-card">
+        <div class="analyses-chart-header">
+          <div>
+            <h3>{{ 'ANALYSES.WATER_CUMUL_CHART' | translate }}</h3>
+            <p>{{ 'ANALYSES.WATER_CUMUL_CHART_DESC' | translate }}</p>
+          </div>
+          <span class="analyses-chart-badge">{{ formatLiters(totalPeriodLiters) }}</span>
+        </div>
+        <div class="analyses-chart-canvas">
+          <canvas #cumulativeWaterCanvas></canvas>
+        </div>
+      </article>
+
+      <!-- Pump Session Timeline (table) -->
+      <article class="analyses-chart-card surface-card analyses-sessions-card">
+        <div class="analyses-chart-header">
+          <div>
+            <h3>{{ 'ANALYSES.SESSIONS_LOG' | translate }}</h3>
+            <p>{{ 'ANALYSES.SESSIONS_LOG_DESC' | translate }}</p>
+          </div>
+        </div>
+
+        <div class="analyses-sessions-empty" *ngIf="pumpSessions.length === 0">
+          <mat-icon>water_pump</mat-icon>
+          <span>{{ 'ANALYSES.NO_SESSIONS' | translate }}</span>
+        </div>
+
+        <div class="analyses-sessions-scroll" *ngIf="pumpSessions.length > 0">
+          <table class="analyses-sessions-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>{{ 'ANALYSES.SESSION_START' | translate }}</th>
+                <th>{{ 'ANALYSES.SESSION_END' | translate }}</th>
+                <th>{{ 'ANALYSES.SESSION_DURATION' | translate }}</th>
+                <th>{{ 'ANALYSES.SESSION_WATER' | translate }}</th>
+                <th>{{ 'ANALYSES.SESSION_TRIGGER' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let s of pumpSessions; let i = index">
+                <td class="analyses-sessions-num">{{ i + 1 }}</td>
+                <td>{{ formatDateTime(s.start) }}</td>
+                <td>{{ formatDateTime(s.end) }}</td>
+                <td><strong>{{ formatDuration(s.durationMs) }}</strong></td>
+                <td>{{ sessionLiters(s) }}</td>
+                <td>
+                  <span
+                    class="analyses-trigger-badge"
+                    [class.auto]="s.trigger === 'automatique'"
+                    *ngIf="sessionTriggerKey(s)"
+                  >
+                    {{ sessionTriggerKey(s) | translate }}
+                  </span>
+                  <span *ngIf="!sessionTriggerKey(s)">–</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+    </section>
+
+    <section class="analyses-ai surface-card">
+      <div class="analyses-ai-header">
+        <div>
+          <span class="analyses-ai-badge">{{ 'ANALYSES.AI.BADGE' | translate }}</span>
+          <h3>{{ 'ANALYSES.AI.TITLE' | translate }}</h3>
+          <p>{{ 'ANALYSES.AI.DESCRIPTION' | translate }}</p>
+        </div>
+        <mat-icon class="analyses-ai-icon">psychology</mat-icon>
+      </div>
+
+      <div class="analyses-ai-body">
+        <div class="analyses-ai-placeholder">
+          <mat-icon>auto_awesome</mat-icon>
+          <strong>{{ 'ANALYSES.AI.PLACEHOLDER_TITLE' | translate }}</strong>
+          <span>{{ 'ANALYSES.AI.PLACEHOLDER_DESC' | translate }}</span>
+        </div>
+      </div>
+    </section>
+
+    <p class="analyses-footer-note">
+      <mat-icon>info</mat-icon>
+      {{ 'ANALYSES.FOOTER_NOTE' | translate }}
+    </p>
+  </ng-container>
+</section>

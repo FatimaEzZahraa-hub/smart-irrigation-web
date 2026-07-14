@@ -1,0 +1,131 @@
+.admin-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-open-width);
+  height: 100vh;
+  background: var(--bg-sidebar);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 12px;
+  z-index: 100;
+  border-right: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.admin-sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 18px;
+  min-height: 66px;
+}
+
+.admin-sidebar-logo-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #4c8768, #1f4d38);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(31, 77, 56, 0.35);
+}
+
+.admin-sidebar-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar-logo-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.admin-sidebar-logo-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #9fc79a;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-sidebar-nav {
+  flex: 1;
+  padding: 6px 0;
+  overflow-y: auto;
+}
+
+.admin-sidebar a,
+.admin-sidebar-footer button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 2px 0;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: #cbd5e1;
+  text-decoration: none;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.admin-sidebar a:hover,
+.admin-sidebar-footer button:hover {
+  background: rgba(148, 163, 184, 0.08);
+  color: #fff;
+}
+
+.admin-sidebar a .nav-icon,
+.admin-sidebar-footer button .nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  min-width: 24px;
+}
+
+.admin-sidebar a.active {
+  background: linear-gradient(90deg, rgba(76, 135, 104, 0.32), rgba(20, 184, 166, 0.12));
+  color: #fff;
+}
+
+.admin-sidebar-footer {
+  padding-top: 6px;
+}
+
+.admin-sidebar-footer button:hover {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+@media (max-width: 900px) {
+  .admin-sidebar {
+    width: var(--sidebar-collapsed-width);
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .admin-sidebar-logo-text,
+  .nav-label {
+    display: none;
+  }
+
+  .admin-sidebar-logo {
+    justify-content: center;
+    padding: 10px 0 18px;
+  }
+
+  .admin-sidebar a,
+  .admin-sidebar-footer button {
+    justify-content: center;
+    padding: 12px 0;
+  }
+}

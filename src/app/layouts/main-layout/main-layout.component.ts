@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { AuthService, CurrentUser } from '../../services/auth.service';
+import { AlertStateService, IrrigationAlert } from '../../services/alert-state.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -39,28 +40,8 @@ export class MainLayout implements OnInit, OnDestroy {
   currentUser?: CurrentUser;
   profileLoading = false;
 
-  readonly notifications = [
-    {
-      titleKey: 'ALERTS.LOW_SOIL_HUMIDITY',
-      timeKey: 'NOTIFICATIONS.TIME_5_MIN',
-      icon: 'warning',
-      type: 'warning'
-    },
-    {
-      titleKey: 'ALERTS.PUMP_ACTIVATED',
-      timeKey: 'NOTIFICATIONS.TIME_18_MIN',
-      icon: 'water_drop',
-      type: 'info'
-    },
-    {
-      titleKey: 'ALERTS.HIGH_TEMPERATURE',
-      timeKey: 'NOTIFICATIONS.TIME_1_HOUR',
-      icon: 'device_thermostat',
-      type: 'critical'
-    }
-  ];
-
-  readonly maxNotifications = 5;
+  unreadCount = 0;
+  recentNotifications: IrrigationAlert[] = [];
 
   readonly languages = [
     { code: 'fr', labelKey: 'LANGUAGE.FR', short: 'FR', flag: 'FR', locale: 'fr-FR', dir: 'ltr' },
@@ -70,29 +51,26 @@ export class MainLayout implements OnInit, OnDestroy {
 
   selectedLanguage = this.languages[0];
 
-  get recentNotifications() {
-    return this.notifications.slice(0, this.maxNotifications);
-  }
-
-  get notificationCount(): number {
-    return this.notifications.length;
-  }
-
   private readonly routeTitles: Record<string, string> = {
     '/dashboard': 'NAV.DASHBOARD',
     '/history': 'NAV.HISTORY',
+    '/analyses': 'NAV.ANALYSES',
     '/alerts': 'NAV.ALERTS',
     '/pump-control': 'NAV.PUMP_CONTROL',
-    '/settings': 'NAV.SETTINGS'
+    '/settings': 'NAV.SETTINGS',
+    '/about': 'NAV.ABOUT'
   };
 
   private routerSub?: Subscription;
   private profileSub?: Subscription;
+  private unreadSub?: Subscription;
+  private recentSub?: Subscription;
 
   constructor(
     private router: Router,
     private translate: TranslateService,
     private authService: AuthService,
+    readonly alertState: AlertStateService,
     @Inject(DOCUMENT) private document: Document
   ) {}
 
@@ -115,11 +93,21 @@ export class MainLayout implements OnInit, OnDestroy {
         this.currentTitle = this.getTitleFromUrl(event.urlAfterRedirects || event.url);
       }
     });
+
+    this.unreadSub = this.alertState.unreadCount$.subscribe(count => {
+      this.unreadCount = count;
+    });
+
+    this.recentSub = this.alertState.recentAlerts$.subscribe(alerts => {
+      this.recentNotifications = alerts;
+    });
   }
 
   ngOnDestroy(): void {
     this.routerSub?.unsubscribe();
     this.profileSub?.unsubscribe();
+    this.unreadSub?.unsubscribe();
+    this.recentSub?.unsubscribe();
   }
 
   get userInitials(): string {
@@ -153,7 +141,7 @@ export class MainLayout implements OnInit, OnDestroy {
   logout(): void {
     this.authService.logout();
     this.closeProfileMenu();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   changeLanguage(languageCode: string, persist = true): void {

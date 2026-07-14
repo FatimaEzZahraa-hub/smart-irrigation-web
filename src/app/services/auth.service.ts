@@ -47,6 +47,12 @@ export class AuthService {
     }).pipe(map((user) => this.normalizeUser(user)));
   }
 
+  changePassword(data: { currentPassword: string; newPassword: string }) {
+    return this.http.patch(`${this.api}/change-password`, data, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   logout(): void {
     localStorage.removeItem('token');
   }

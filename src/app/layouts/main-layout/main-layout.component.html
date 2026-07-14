@@ -1,5 +1,5 @@
 <div class="app-shell" [class.sidebar-collapsed]="sidebarCollapsed">
-  <app-sidebar (collapsedChange)="onSidebarCollapsedChange($event)"></app-sidebar>
+  <app-sidebar [alertCount]="unreadCount" (collapsedChange)="onSidebarCollapsedChange($event)"></app-sidebar>
 
   <div class="main-panel">
     <header class="topbar">
@@ -41,13 +41,12 @@
           class="topbar-icon-btn notification-trigger"
           type="button"
           [matMenuTriggerFor]="notificationsMenu"
-          [matBadge]="notificationCount"
-          [matBadgeHidden]="notificationCount === 0"
-          matBadgeColor="warn"
-          matBadgeSize="small"
           [attr.aria-label]="'NOTIFICATIONS.OPEN' | translate"
         >
           <mat-icon>notifications</mat-icon>
+          <span class="notif-badge" *ngIf="unreadCount > 0" aria-hidden="true">
+            {{ unreadCount > 9 ? '9+' : unreadCount }}
+          </span>
         </button>
         <mat-menu #notificationsMenu="matMenu" xPosition="before" class="notification-menu">
           <div class="notification-panel" (click)="$event.stopPropagation()">
@@ -56,7 +55,7 @@
                 <p>{{ 'NOTIFICATIONS.EYEBROW' | translate }}</p>
                 <h2>{{ 'NOTIFICATIONS.TITLE' | translate }}</h2>
               </div>
-              <span class="notification-count">{{ notificationCount }}</span>
+              <span class="notification-count">{{ unreadCount }}</span>
             </div>
 
             <div class="notification-list">
@@ -64,13 +63,14 @@
                 class="notification-item"
                 type="button"
                 *ngFor="let notification of recentNotifications"
+                (click)="alertState.markAsRead(notification.id); closeNotificationsMenu()"
               >
-                <span class="notification-icon" [ngClass]="notification.type">
-                  <mat-icon>{{ notification.icon }}</mat-icon>
+                <span class="notification-icon" [ngClass]="notification.severity">
+                  <mat-icon>{{ alertState.getIcon(notification.type) }}</mat-icon>
                 </span>
                 <span class="notification-copy">
                   <span class="notification-title">{{ notification.titleKey | translate }}</span>
-                  <span class="notification-time">{{ notification.timeKey | translate }}</span>
+                  <span class="notification-time">{{ alertState.getRelativeTime(notification.timestamp) }}</span>
                 </span>
               </button>
             </div>

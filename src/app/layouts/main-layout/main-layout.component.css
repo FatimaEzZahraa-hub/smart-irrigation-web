@@ -148,16 +148,55 @@
   background: #ffffff;
   color: var(--text-secondary);
   cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
 }
 
 .topbar-icon-btn:hover {
   border-color: var(--border-hover);
   color: var(--text-primary);
+  background: var(--slate-50);
 }
 
-.notification-trigger ::ng-deep .mat-badge-content {
-  font-size: 0.68rem;
+/* ── Notification trigger ─────────────────────────────────── */
+.notification-trigger:hover mat-icon {
+  animation: bell-ring 0.45s ease;
+}
+
+.notification-trigger.mat-menu-opened,
+.notification-trigger[aria-expanded="true"] {
+  border-color: var(--green-600);
+  background: var(--green-50);
+  color: var(--green-700);
+}
+
+/* Custom badge — fully controlled, replaces matBadge */
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--red-500);
+  color: #ffffff;
+  font-size: 0.6rem;
   font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  line-height: 1;
+  pointer-events: none;
+}
+
+@keyframes bell-ring {
+  0%   { transform: rotate(0deg); }
+  15%  { transform: rotate(10deg); }
+  35%  { transform: rotate(-9deg); }
+  55%  { transform: rotate(7deg); }
+  75%  { transform: rotate(-4deg); }
+  100% { transform: rotate(0deg); }
 }
 
 ::ng-deep .mat-mdc-menu-panel.notification-menu,
@@ -260,8 +299,8 @@
 }
 
 .notification-icon.info {
-  background: #dbeafe;
-  color: #2563eb;
+  background: var(--blue-100);
+  color: var(--blue-600);
 }
 
 .notification-icon.critical {
@@ -321,7 +360,7 @@
   height: 42px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(135deg, #16a34a, #2563eb);
+  background: linear-gradient(135deg, #2f6b4f, #0d9488);
   color: #fff;
   font-weight: 700;
   cursor: pointer;
@@ -360,7 +399,7 @@
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #16a34a, #2563eb);
+  background: linear-gradient(135deg, #2f6b4f, #0d9488);
   color: #ffffff;
   font-size: 0.95rem;
   font-weight: 800;

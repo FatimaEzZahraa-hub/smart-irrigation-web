@@ -1,0 +1,216 @@
+<section class="about-page page-content">
+  <header class="about-header page-toolbar">
+    <div>
+      <p class="about-eyebrow page-eyebrow">{{ 'ABOUT.EYEBROW' | translate }}</p>
+      <h2>{{ 'ABOUT.TITLE' | translate }}</h2>
+      <p class="about-subtitle">{{ 'ABOUT.SUBTITLE' | translate }}</p>
+    </div>
+  </header>
+
+  <div class="about-content">
+    <!-- ── Section 1: Hero ─────────────────────────────────── -->
+    <section class="about-hero surface-card">
+      <div class="about-hero-visual" aria-hidden="true">
+        <div class="about-hero-scene">
+          <div class="about-hero-sun"></div>
+          <div class="about-hero-hills"></div>
+          <div class="about-hero-plant">
+            <mat-icon>eco</mat-icon>
+          </div>
+          <div class="about-hero-sensor">
+            <mat-icon>sensors</mat-icon>
+          </div>
+          <div class="about-hero-waves">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-hero-text">
+        <div class="about-brand">
+          <div class="about-brand-icon">
+            <mat-icon>eco</mat-icon>
+          </div>
+          <div>
+            <strong>AgroSync</strong>
+            <span>{{ 'APP.NAME' | translate }}</span>
+          </div>
+        </div>
+
+        <h3>{{ 'ABOUT.HERO.TITLE' | translate }}</h3>
+        <p class="about-hero-desc">{{ 'ABOUT.HERO.SUBTITLE' | translate }}</p>
+
+        <div class="about-hero-actions">
+          <button class="app-action-btn primary" type="button" (click)="scrollToWorkflow()">
+            <mat-icon>explore</mat-icon>
+            {{ 'ABOUT.HERO.DISCOVER' | translate }}
+          </button>
+          <a class="app-action-btn" [href]="userGuideUrl" download="Smart-Irrigation-User-Guide.pdf" [attr.aria-label]="'ABOUT.HERO.DOWNLOAD_GUIDE' | translate">
+            <mat-icon>download</mat-icon>
+            {{ 'ABOUT.HERO.DOWNLOAD_GUIDE' | translate }}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Section 2: How Smart Irrigation Works ──────────── -->
+    <section class="about-section-block surface-card" id="how-it-works">
+      <div class="about-section-header">
+        <p class="about-section-eyebrow">{{ 'ABOUT.WORKFLOW.EYEBROW' | translate }}</p>
+        <h3>{{ 'ABOUT.WORKFLOW.TITLE' | translate }}</h3>
+        <p class="about-section-desc">{{ 'ABOUT.WORKFLOW.SUBTITLE' | translate }}</p>
+      </div>
+
+      <div class="about-workflow">
+        <ng-container *ngFor="let step of workflowSteps; let i = index; let last = last">
+          <article class="about-workflow-step">
+            <span class="about-workflow-index">{{ i + 1 }}</span>
+            <div class="about-workflow-icon">
+              <mat-icon>{{ step.icon }}</mat-icon>
+            </div>
+            <h4>{{ step.titleKey | translate }}</h4>
+            <p>{{ step.descKey | translate }}</p>
+          </article>
+          <div class="about-workflow-arrow" *ngIf="!last" aria-hidden="true">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </ng-container>
+      </div>
+    </section>
+
+    <!-- ── Section 3: Main Features ────────────────────────── -->
+    <section class="about-section-block surface-card">
+      <div class="about-section-header">
+        <p class="about-section-eyebrow">{{ 'ABOUT.FEATURES.EYEBROW' | translate }}</p>
+        <h3>{{ 'ABOUT.FEATURES.TITLE' | translate }}</h3>
+        <p class="about-section-desc">{{ 'ABOUT.FEATURES.SUBTITLE' | translate }}</p>
+      </div>
+
+      <div class="about-features-grid">
+        <a class="about-feature-card" *ngFor="let feature of features" [routerLink]="feature.route">
+          <div class="about-feature-icon">
+            <mat-icon>{{ feature.icon }}</mat-icon>
+          </div>
+          <h4>{{ feature.titleKey | translate }}</h4>
+          <p>{{ feature.descKey | translate }}</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- ── Section 4: Irrigation Modes ──────────────────────── -->
+    <section class="about-section-block surface-card">
+      <div class="about-section-header">
+        <p class="about-section-eyebrow">{{ 'ABOUT.MODES.EYEBROW' | translate }}</p>
+        <h3>{{ 'ABOUT.MODES.TITLE' | translate }}</h3>
+        <p class="about-section-desc">{{ 'ABOUT.MODES.SUBTITLE' | translate }}</p>
+      </div>
+
+      <div class="about-modes-grid">
+        <article class="about-mode-card auto">
+          <div class="about-mode-header">
+            <div class="about-mode-icon"><mat-icon>auto_mode</mat-icon></div>
+            <h4>{{ 'ABOUT.MODES.AUTO_TITLE' | translate }}</h4>
+          </div>
+          <ul class="about-mode-list">
+            <li *ngFor="let point of automaticPoints">
+              <mat-icon>check_circle</mat-icon>
+              {{ point.textKey | translate }}
+            </li>
+          </ul>
+        </article>
+
+        <article class="about-mode-card manual">
+          <div class="about-mode-header">
+            <div class="about-mode-icon"><mat-icon>pan_tool</mat-icon></div>
+            <h4>{{ 'ABOUT.MODES.MANUAL_TITLE' | translate }}</h4>
+          </div>
+          <ul class="about-mode-list">
+            <li *ngFor="let point of manualPoints">
+              <mat-icon>check_circle</mat-icon>
+              {{ point.textKey | translate }}
+            </li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── Section 5: User Guide / Getting Started ─────────── -->
+    <section class="about-section-block surface-card">
+      <div class="about-section-header">
+        <p class="about-section-eyebrow">{{ 'ABOUT.GUIDE.EYEBROW' | translate }}</p>
+        <h3>{{ 'ABOUT.GUIDE.TITLE' | translate }}</h3>
+        <p class="about-section-desc">{{ 'ABOUT.GUIDE.SUBTITLE' | translate }}</p>
+      </div>
+
+      <ol class="about-guide-list">
+        <li class="about-guide-step" *ngFor="let step of guideSteps; let i = index">
+          <span class="about-guide-index">{{ i + 1 }}</span>
+          <div class="about-guide-icon"><mat-icon>{{ step.icon }}</mat-icon></div>
+          <div>
+            <strong>{{ step.titleKey | translate }}</strong>
+            <p>{{ step.descKey | translate }}</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="about-guide-download">
+        <a class="app-action-btn primary" [href]="userGuideUrl" download="Smart-Irrigation-User-Guide.pdf" [attr.aria-label]="'ABOUT.HERO.DOWNLOAD_GUIDE' | translate">
+          <mat-icon>picture_as_pdf</mat-icon>
+          {{ 'ABOUT.HERO.DOWNLOAD_GUIDE' | translate }}
+        </a>
+        <p class="about-guide-note">{{ 'ABOUT.GUIDE.NOTE' | translate }}</p>
+      </div>
+    </section>
+
+    <!-- ── Section 6: FAQ ───────────────────────────────────── -->
+    <section class="about-section-block surface-card">
+      <div class="about-section-header">
+        <p class="about-section-eyebrow">{{ 'ABOUT.FAQ.EYEBROW' | translate }}</p>
+        <h3>{{ 'ABOUT.FAQ.TITLE' | translate }}</h3>
+      </div>
+
+      <div class="about-faq-list">
+        <div class="about-faq-item" [class.open]="item.open" *ngFor="let item of faqs">
+          <button type="button" class="about-faq-question" (click)="toggleFaq(item)" [attr.aria-expanded]="item.open">
+            <span>{{ item.qKey | translate }}</span>
+            <mat-icon>{{ item.open ? 'remove' : 'add' }}</mat-icon>
+          </button>
+          <div class="about-faq-answer">
+            <p>{{ item.aKey | translate }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Section 7: About the Team (compact) ─────────────── -->
+    <section class="about-team-compact surface-card">
+      <div class="about-team-compact-header">
+        <h3>{{ 'ABOUT.TEAM.TITLE' | translate }}</h3>
+        <p>{{ 'ABOUT.TEAM.DESCRIPTION' | translate }}</p>
+      </div>
+
+      <div class="about-team-compact-grid">
+        <article class="about-member-compact" *ngFor="let member of team">
+          <div class="about-member-avatar" [style.background]="member.accent + '18'" [style.color]="member.accent">
+            {{ member.initials }}
+          </div>
+          <div>
+            <strong>{{ member.nameKey | translate }}</strong>
+            <span>{{ member.roleKey | translate }}</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── Footer ───────────────────────────────────────────── -->
+    <footer class="about-footer">
+      <p class="about-thanks">
+        <mat-icon>favorite</mat-icon>
+        {{ 'ABOUT.FOOTER.THANKS' | translate }}
+      </p>
+      <p class="about-copyright">{{ 'ABOUT.FOOTER.COPYRIGHT' | translate:{ year: '2026' } }}</p>
+    </footer>
+  </div>
+</section>

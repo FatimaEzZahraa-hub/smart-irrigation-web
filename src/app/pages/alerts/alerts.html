@@ -1,24 +1,182 @@
 <section class="alerts-page page-content">
   <header class="alerts-header page-toolbar">
     <div>
-      <p class="alerts-eyebrow page-eyebrow">{{ 'NAV.ALERTS' | translate }}</p>
+      <p class="alerts-eyebrow page-eyebrow">{{ 'ALERTS.EYEBROW' | translate }}</p>
       <h2>{{ 'ALERTS.ACTIVE_ALERTS' | translate }}</h2>
     </div>
-    <button class="alerts-action-btn app-action-btn" type="button">
-      <mat-icon>mark_email_unread</mat-icon>
+    <button
+      class="alerts-action-btn app-action-btn"
+      type="button"
+      [disabled]="unreadCount === 0"
+      (click)="markAllRead()"
+    >
+      <mat-icon>mark_email_read</mat-icon>
       {{ 'ALERTS.MARK_ALL_READ' | translate }}
     </button>
   </header>
 
-  <div class="alerts-list">
-    <article class="alert-card surface-card" *ngFor="let a of alerts">
-      <div class="alert-icon" [ngClass]="a.severity">
-        <mat-icon>{{ a.severity === 'critical' ? 'error' : a.severity === 'warning' ? 'warning' : 'info' }}</mat-icon>
+  <!-- Filter tabs -->
+  <div class="alerts-filters">
+    <button
+      class="alerts-filter-btn"
+      [class.active]="activeFilter === 'all'"
+      type="button"
+      (click)="setFilter('all')"
+    >
+      <mat-icon>list</mat-icon>
+      {{ 'ALERTS.FILTER.ALL' | translate }}
+      <span class="filter-badge">{{ alerts.length }}</span>
+    </button>
+    <button
+      class="alerts-filter-btn"
+      [class.active]="activeFilter === 'unread'"
+      type="button"
+      (click)="setFilter('unread')"
+    >
+      <mat-icon>mark_email_unread</mat-icon>
+      {{ 'ALERTS.FILTER.UNREAD' | translate }}
+      <span class="filter-badge unread" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+    </button>
+    <button
+      class="alerts-filter-btn"
+      [class.active]="activeFilter === 'warning'"
+      type="button"
+      (click)="setFilter('warning')"
+    >
+      <mat-icon>warning</mat-icon>
+      {{ 'ALERTS.FILTER.WARNINGS' | translate }}
+      <span class="filter-badge warning" *ngIf="countBySeverity('warning') > 0">{{ countBySeverity('warning') }}</span>
+    </button>
+    <button
+      class="alerts-filter-btn"
+      [class.active]="activeFilter === 'info'"
+      type="button"
+      (click)="setFilter('info')"
+    >
+      <mat-icon>info</mat-icon>
+      {{ 'ALERTS.FILTER.INFO' | translate }}
+      <span class="filter-badge info" *ngIf="countBySeverity('info') > 0">{{ countBySeverity('info') }}</span>
+    </button>
+    <button
+      class="alerts-filter-btn"
+      [class.active]="activeFilter === 'critical'"
+      type="button"
+      (click)="setFilter('critical')"
+    >
+      <mat-icon>error</mat-icon>
+      {{ 'ALERTS.FILTER.CRITICAL' | translate }}
+      <span class="filter-badge critical" *ngIf="countBySeverity('critical') > 0">{{ countBySeverity('critical') }}</span>
+    </button>
+  </div>
+
+  <!-- Alerts list -->
+  <div class="alerts-list" *ngIf="filteredAlerts.length > 0; else emptyState">
+    <article
+      class="alert-card surface-card"
+      [class.unread]="!a.read"
+      [class.resolved]="a.resolved"
+      [attr.data-severity]="a.severity"
+      *ngFor="let a of filteredAlerts"
+      (click)="markAsRead(a)"
+    >
+      <!-- Card header: icon + meta + time -->
+      <div class="alert-card-header">
+        <div class="alert-icon" [ngClass]="a.severity">
+          <mat-icon>{{ getAlertIcon(a.type) }}</mat-icon>
+        </div>
+
+        <div class="alert-header-meta">
+          <div class="alert-meta-row">
+            <span class="alert-zone-chip">
+              <mat-icon>location_on</mat-icon>
+              {{ a.zone }}
+            </span>
+            <span class="alert-severity-badge" [ngClass]="a.severity">
+              {{ ('ALERTS.SEVERITY.' + a.severity.toUpperCase()) | translate }}
+            </span>
+            <span class="alert-resolved-badge" *ngIf="a.resolved">
+              <mat-icon>check_circle</mat-icon>
+              {{ 'ALERTS.RESOLVED' | translate }}
+            </span>
+            <span class="alert-unread-dot" *ngIf="!a.read" [attr.aria-label]="'ALERTS.UNREAD' | translate"></span>
+          </div>
+          <h3 class="alert-title">{{ a.titleKey | translate }}</h3>
+        </div>
+
+        <span class="alert-time" [title]="formatFullDate(a.timestamp)">
+          <mat-icon>schedule</mat-icon>
+          {{ getRelativeTime(a.timestamp) }}
+        </span>
       </div>
-      <div class="alert-content">
-        <h3>{{ ('ALERTS.SEVERITY.' + a.severity.toUpperCase()) | translate }}</h3>
-        <p>{{ a.message | translate }}</p>
+
+      <!-- Card body: description + sensor value + recommendation -->
+      <div class="alert-card-body">
+        <p class="alert-description">{{ a.descriptionKey | translate }}</p>
+
+        <span class="alert-value-chip" *ngIf="a.sensorValue">
+          <mat-icon>sensors</mat-icon>
+          {{ 'ALERTS.CURRENT_VALUE' | translate }}: <strong>{{ a.sensorValue }}</strong>
+        </span>
+
+        <div class="alert-recommendation">
+          <mat-icon>tips_and_updates</mat-icon>
+          <span>{{ a.recommendationKey | translate }}</span>
+        </div>
+      </div>
+
+      <!-- Card footer: nav link + action buttons -->
+      <div class="alert-card-footer">
+        <a
+          *ngIf="a.navLink && a.navLabelKey"
+          class="alert-nav-link"
+          [routerLink]="a.navLink"
+          (click)="$event.stopPropagation()"
+        >
+          <mat-icon>{{ a.navIcon }}</mat-icon>
+          {{ a.navLabelKey | translate }}
+          <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+        </a>
+
+        <div class="alert-actions">
+          <button
+            class="alert-action-icon"
+            type="button"
+            *ngIf="!a.read"
+            (click)="markAsRead(a); $event.stopPropagation()"
+            [attr.aria-label]="'ALERTS.MARK_READ' | translate"
+            [title]="'ALERTS.MARK_READ' | translate"
+          >
+            <mat-icon>done</mat-icon>
+          </button>
+          <button
+            class="alert-action-icon resolve"
+            type="button"
+            *ngIf="!a.resolved"
+            (click)="resolveAlert(a, $event)"
+            [attr.aria-label]="'ALERTS.RESOLVE' | translate"
+            [title]="'ALERTS.RESOLVE' | translate"
+          >
+            <mat-icon>check_circle_outline</mat-icon>
+          </button>
+          <button
+            class="alert-action-icon danger"
+            type="button"
+            (click)="deleteAlert(a, $event)"
+            [attr.aria-label]="'ALERTS.DELETE' | translate"
+            [title]="'ALERTS.DELETE' | translate"
+          >
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
       </div>
     </article>
   </div>
+
+  <!-- Empty state -->
+  <ng-template #emptyState>
+    <div class="alerts-empty surface-card">
+      <mat-icon>notifications_none</mat-icon>
+      <p>{{ (activeFilter === 'all' ? 'ALERTS.EMPTY' : 'ALERTS.EMPTY_FILTERED') | translate }}</p>
+    </div>
+  </ng-template>
 </section>

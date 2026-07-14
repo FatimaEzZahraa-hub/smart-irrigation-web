@@ -1,0 +1,509 @@
+<div class="landing-page">
+
+  <!-- ── Top nav ─────────────────────────────────────────────── -->
+  <header class="landing-nav" [class.scrolled]="navScrolled">
+    <a routerLink="/" class="landing-brand">
+      <span class="landing-brand-icon"><mat-icon>eco</mat-icon></span>
+      <span class="landing-brand-name">AgroSync</span>
+    </a>
+
+    <nav class="landing-nav-links">
+      <a href="#features">{{ 'LANDING.NAV.FEATURES' | translate }}</a>
+      <a href="#product-tour">{{ 'LANDING.NAV.PRODUCT_TOUR' | translate }}</a>
+      <a href="#how-it-works">{{ 'LANDING.NAV.HOW_IT_WORKS' | translate }}</a>
+      <a href="#comparison">{{ 'LANDING.NAV.COMPARISON' | translate }}</a>
+      <a href="#testimonials">{{ 'LANDING.NAV.TESTIMONIALS' | translate }}</a>
+      <a href="#faq">{{ 'LANDING.NAV.FAQ' | translate }}</a>
+    </nav>
+
+    <div class="landing-nav-auth">
+      <a routerLink="/login" class="landing-nav-login" [attr.aria-label]="'LANDING.NAV.USER_LOGIN' | translate">
+        <mat-icon>person</mat-icon>
+        <span class="landing-nav-auth-label">{{ 'LANDING.NAV.USER_LOGIN' | translate }}</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ── Hero ────────────────────────────────────────────────── -->
+  <section class="landing-hero">
+    <div class="landing-hero-copy">
+      <span class="landing-eyebrow">
+        <span class="landing-live-dot"></span>
+        {{ 'LANDING.HERO.EYEBROW' | translate }}
+      </span>
+      <h1 class="landing-hero-title">{{ 'LANDING.HERO.TITLE' | translate }}</h1>
+      <p class="landing-hero-subtitle">{{ 'LANDING.HERO.SUBTITLE' | translate }}</p>
+
+      <div class="landing-hero-actions">
+        <a routerLink="/login" class="landing-btn landing-btn-primary">
+          <mat-icon>person</mat-icon>
+          {{ 'LANDING.HERO.USER_LOGIN' | translate }}
+        </a>
+      </div>
+
+      <p class="landing-hero-signup-hint">
+        {{ 'LANDING.HERO.NO_ACCOUNT' | translate }}
+        <a routerLink="/signup">{{ 'LANDING.HERO.GET_STARTED' | translate }}</a>
+      </p>
+
+      <p class="landing-hero-microcopy">
+        <mat-icon>verified</mat-icon>
+        {{ 'LANDING.HERO.MICROCOPY' | translate }}
+      </p>
+    </div>
+
+    <div class="landing-hero-visual">
+      <div class="browser-mock hero-mock">
+        <div class="browser-mock-bar">
+          <span class="browser-dot red"></span>
+          <span class="browser-dot yellow"></span>
+          <span class="browser-dot green"></span>
+          <span class="browser-mock-url">app.agrosync.io/dashboard</span>
+        </div>
+
+        <div class="browser-mock-body">
+          <div class="mock-kpi-grid">
+            <div class="mock-kpi mock-kpi-green">
+              <mat-icon>grass</mat-icon>
+              <div>
+                <span>{{ 'LANDING.PREVIEW.MOISTURE' | translate }}</span>
+                <strong>{{ liveMoisture }}%</strong>
+              </div>
+            </div>
+            <div class="mock-kpi mock-kpi-orange">
+              <mat-icon>device_thermostat</mat-icon>
+              <div>
+                <span>{{ 'LANDING.PREVIEW.TEMPERATURE' | translate }}</span>
+                <strong>{{ liveTemperature }}&deg;C</strong>
+              </div>
+            </div>
+            <div class="mock-kpi mock-kpi-blue">
+              <mat-icon>water_drop</mat-icon>
+              <div>
+                <span>{{ 'LANDING.PREVIEW.HUMIDITY' | translate }}</span>
+                <strong>{{ liveHumidity }}%</strong>
+              </div>
+            </div>
+            <div class="mock-kpi mock-kpi-teal" [class.is-pulsing]="livePumpJustToggled">
+              <mat-icon>{{ livePumpOn ? 'water_pump' : 'power_settings_new' }}</mat-icon>
+              <div>
+                <span>{{ 'LANDING.PREVIEW.PUMP' | translate }}</span>
+                <strong>{{ (livePumpOn ? 'LANDING.PREVIEW.PUMP_ON' : 'LANDING.PREVIEW.PUMP_OFF') | translate }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-chart">
+            <span class="mock-chart-label">{{ 'LANDING.PREVIEW.TREND' | translate }}</span>
+            <svg viewBox="0 0 280 90" preserveAspectRatio="none" class="mock-chart-svg">
+              <polyline [attr.points]="chartPointsAttr()" fill="none" stroke="url(#chartGradient)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs>
+                <linearGradient id="chartGradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#2f6b4f"/>
+                  <stop offset="100%" stop-color="#0d9488"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <span class="hero-floating-badge badge-top">
+        <mat-icon>bolt</mat-icon>
+        {{ 'LANDING.PREVIEW.AUTO_BADGE' | translate }}
+      </span>
+      <span class="hero-floating-badge badge-bottom">
+        <mat-icon>wifi</mat-icon>
+        {{ 'LANDING.PREVIEW.ZONES_BADGE' | translate }}
+      </span>
+    </div>
+  </section>
+
+  <!-- ── Animated stats band ─────────────────────────────────── -->
+  <section class="landing-stats" #statsAnchor>
+    <div class="landing-stats-grid">
+      <div class="landing-stat reveal" *ngFor="let stat of stats">
+        <mat-icon>{{ stat.icon }}</mat-icon>
+        <strong>{{ stat.current.toFixed(stat.decimals) }}{{ stat.suffix }}</strong>
+        <span>{{ stat.labelKey | translate }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Features ────────────────────────────────────────────── -->
+  <section class="landing-section" id="features">
+    <div class="landing-section-header reveal">
+      <span class="landing-eyebrow">{{ 'LANDING.FEATURES.EYEBROW' | translate }}</span>
+      <h2>{{ 'LANDING.FEATURES.TITLE' | translate }}</h2>
+      <p>{{ 'LANDING.FEATURES.SUBTITLE' | translate }}</p>
+    </div>
+
+    <div class="landing-features-grid">
+      <article class="landing-card reveal" *ngFor="let feature of features">
+        <div class="landing-card-icon"><mat-icon>{{ feature.icon }}</mat-icon></div>
+        <h3>{{ feature.titleKey | translate }}</h3>
+        <p>{{ feature.descKey | translate }}</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── Product tour / big dashboard preview ───────────────────── -->
+  <section class="landing-section landing-section-alt" id="product-tour">
+    <div class="landing-section-header reveal">
+      <span class="landing-eyebrow">{{ 'LANDING.TOUR.EYEBROW' | translate }}</span>
+      <h2>{{ 'LANDING.TOUR.TITLE' | translate }}</h2>
+      <p>{{ 'LANDING.TOUR.SUBTITLE' | translate }}</p>
+    </div>
+
+    <div class="browser-mock tour-mock reveal">
+      <div class="browser-mock-bar">
+        <span class="browser-dot red"></span>
+        <span class="browser-dot yellow"></span>
+        <span class="browser-dot green"></span>
+        <span class="browser-mock-url">app.agrosync.io/dashboard</span>
+        <span class="browser-mock-live"><span class="landing-live-dot"></span>{{ 'LANDING.TOUR.LIVE' | translate }}</span>
+      </div>
+
+      <div class="tour-body">
+        <aside class="tour-sidebar">
+          <div class="tour-sidebar-logo">
+            <span class="tour-sidebar-logo-icon"><mat-icon>eco</mat-icon></span>
+            <div>
+              <strong>AgroSync</strong>
+              <span>{{ 'APP.NAME' | translate }}</span>
+            </div>
+          </div>
+
+          <div class="tour-sidebar-device">
+            <span class="tour-device-dot"></span>
+            <div>
+              <strong>ESP32 - Zone A</strong>
+              <span>{{ 'SIDEBAR.DEVICE_STATUS' | translate }}</span>
+            </div>
+          </div>
+
+          <nav class="tour-sidebar-nav">
+            <span class="tour-nav-label">{{ 'SIDEBAR.MONITOR' | translate }}</span>
+            <span class="tour-nav-item active"><mat-icon>dashboard</mat-icon>{{ 'NAV.DASHBOARD' | translate }}</span>
+            <span class="tour-nav-item"><mat-icon>history</mat-icon>{{ 'NAV.HISTORY' | translate }}</span>
+            <span class="tour-nav-item"><mat-icon>insights</mat-icon>{{ 'NAV.ANALYSES' | translate }}</span>
+            <span class="tour-nav-item">
+              <mat-icon>notifications</mat-icon>{{ 'NAV.ALERTS' | translate }}
+              <span class="tour-nav-badge">4</span>
+            </span>
+            <span class="tour-nav-divider"></span>
+            <span class="tour-nav-label">{{ 'SIDEBAR.CONTROL' | translate }}</span>
+            <span class="tour-nav-item"><mat-icon>water_drop</mat-icon>{{ 'NAV.PUMP_CONTROL' | translate }}</span>
+            <span class="tour-nav-item"><mat-icon>settings</mat-icon>{{ 'NAV.SETTINGS' | translate }}</span>
+          </nav>
+
+          <span class="tour-nav-item tour-logout"><mat-icon>logout</mat-icon>{{ 'NAV.LOGOUT' | translate }}</span>
+        </aside>
+
+        <div class="tour-main">
+          <div class="tour-summary">
+            <div>
+              <span class="tour-eyebrow-small">{{ 'DASHBOARD.EYEBROW' | translate }}</span>
+              <h4>{{ 'DASHBOARD.TITLE' | translate }}</h4>
+            </div>
+            <div class="tour-zone-select">
+              <span>{{ 'DASHBOARD.SELECT_ZONE' | translate }}</span>
+              <strong>Zone A - D&eacute;mo <mat-icon>expand_more</mat-icon></strong>
+            </div>
+          </div>
+
+          <span class="tour-section-label">{{ 'DASHBOARD.LIVE_READINGS' | translate }}</span>
+          <div class="tour-kpi-grid">
+            <div class="tour-kpi-card green">
+              <div class="tour-kpi-top"></div>
+              <div class="tour-kpi-head">
+                <span>{{ 'DASHBOARD.SOIL_HUMIDITY' | translate }}</span>
+                <span class="tour-kpi-icon"><mat-icon>grass</mat-icon></span>
+              </div>
+              <strong>{{ liveMoisture }}<small>%</small></strong>
+              <span class="tour-kpi-foot">{{ soilStatusKey | translate }}</span>
+            </div>
+
+            <div class="tour-kpi-card orange">
+              <div class="tour-kpi-top"></div>
+              <div class="tour-kpi-head">
+                <span>{{ 'DASHBOARD.TEMPERATURE' | translate }}</span>
+                <span class="tour-kpi-icon"><mat-icon>device_thermostat</mat-icon></span>
+              </div>
+              <strong>{{ liveTemperature }}<small>&deg;C</small></strong>
+              <span class="tour-kpi-foot">{{ 'DASHBOARD.STABLE' | translate }}</span>
+            </div>
+
+            <div class="tour-kpi-card blue">
+              <div class="tour-kpi-top"></div>
+              <div class="tour-kpi-head">
+                <span>{{ 'DASHBOARD.AIR_HUMIDITY' | translate }}</span>
+                <span class="tour-kpi-icon"><mat-icon>water_drop</mat-icon></span>
+              </div>
+              <strong>{{ liveHumidity }}<small>%</small></strong>
+              <span class="tour-kpi-foot">{{ 'DASHBOARD.SINCE_LAST_HOUR' | translate }}</span>
+            </div>
+
+            <div class="tour-kpi-card teal" [class.is-pulsing]="livePumpJustToggled">
+              <div class="tour-kpi-top"></div>
+              <div class="tour-kpi-head">
+                <span>{{ 'DASHBOARD.PUMP_STATUS' | translate }}</span>
+                <span class="tour-kpi-icon"><mat-icon>water_pump</mat-icon></span>
+              </div>
+              <strong class="tour-pump-value">
+                <span class="tour-pump-dot" [class.on]="livePumpOn"></span>
+                {{ (livePumpOn ? 'LANDING.PREVIEW.PUMP_ON' : 'LANDING.PREVIEW.PUMP_OFF') | translate }}
+              </strong>
+              <span class="tour-kpi-foot">{{ 'DASHBOARD.MANUAL_MODE_ACTIVE' | translate }}</span>
+            </div>
+          </div>
+
+          <div class="tour-panels">
+            <div class="tour-soil-card">
+              <div class="tour-panel-head">
+                <div>
+                  <span class="tour-section-label">{{ 'DASHBOARD.SOIL.CURRENT_TITLE' | translate }}</span>
+                  <h5>Zone A - D&eacute;mo</h5>
+                </div>
+                <span class="tour-status-pill"><span></span>{{ soilStatusKey | translate }}</span>
+              </div>
+              <div class="tour-soil-body">
+                <div class="tour-soil-ring" [style.--soil-level]="liveMoisture + '%'">
+                  <div class="tour-soil-core">
+                    <mat-icon>grass</mat-icon>
+                    <strong>{{ liveMoisture }}%</strong>
+                  </div>
+                </div>
+                <div class="tour-soil-meta">
+                  <div>
+                    <span>{{ 'DASHBOARD.SOIL.STATUS' | translate }}</span>
+                    <strong>{{ soilStatusKey | translate }}</strong>
+                  </div>
+                  <div>
+                    <span>{{ 'DASHBOARD.SOIL.LAST_UPDATE_LABEL' | translate }}</span>
+                    <strong>{{ 'LANDING.TOUR.LIVE' | translate }}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tour-weather-card">
+              <span class="tour-section-label">{{ 'DASHBOARD.WEATHER.TITLE' | translate }}</span>
+              <div class="tour-weather-temp">
+                <strong>26<span>&deg;C</span></strong>
+                <p>{{ 'LANDING.PREVIEW.CLEAR_SKY' | translate }}</p>
+              </div>
+              <div class="tour-weather-metrics">
+                <div>
+                  <mat-icon>water_drop</mat-icon>
+                  <span>{{ 'DASHBOARD.WEATHER.HUMIDITY' | translate }}</span>
+                  <strong>58%</strong>
+                </div>
+                <div>
+                  <mat-icon>air</mat-icon>
+                  <span>{{ 'DASHBOARD.WEATHER.WIND' | translate }}</span>
+                  <strong>12 km/h</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <span class="tour-section-label">{{ 'DASHBOARD.QUICK_ACTIONS' | translate }}</span>
+          <div class="tour-quick-actions">
+            <span class="tour-qa-btn primary"><mat-icon>water_drop</mat-icon>{{ 'DASHBOARD.CONTROL_PUMP' | translate }}</span>
+            <span class="tour-qa-btn"><mat-icon>query_stats</mat-icon>{{ 'DASHBOARD.VIEW_HISTORY' | translate }}</span>
+            <span class="tour-qa-btn"><mat-icon>notifications_active</mat-icon>{{ 'DASHBOARD.VIEW_ALERTS' | translate }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── How it works ────────────────────────────────────────── -->
+  <section class="landing-section" id="how-it-works">
+    <div class="landing-section-header reveal">
+      <span class="landing-eyebrow">{{ 'LANDING.HOW.EYEBROW' | translate }}</span>
+      <h2>{{ 'LANDING.HOW.TITLE' | translate }}</h2>
+      <p>{{ 'LANDING.HOW.SUBTITLE' | translate }}</p>
+    </div>
+
+    <div class="landing-flow reveal">
+      <ng-container *ngFor="let step of steps; let i = index; let last = last">
+        <div class="landing-flow-step" [class.is-active]="activeStep === i">
+          <div class="landing-flow-icon"><mat-icon>{{ step.icon }}</mat-icon></div>
+          <span class="landing-flow-index">{{ i + 1 }}</span>
+          <h4>{{ step.titleKey | translate }}</h4>
+          <p>{{ step.descKey | translate }}</p>
+        </div>
+        <div class="landing-flow-arrow" [class.is-active]="activeStep === i" *ngIf="!last">
+          <mat-icon>arrow_forward</mat-icon>
+        </div>
+      </ng-container>
+    </div>
+  </section>
+
+  <!-- ── Benefits ────────────────────────────────────────────── -->
+  <section class="landing-section landing-section-alt" id="benefits">
+    <div class="landing-section-header reveal">
+      <span class="landing-eyebrow">{{ 'LANDING.BENEFITS.EYEBROW' | translate }}</span>
+      <h2>{{ 'LANDING.BENEFITS.TITLE' | translate }}</h2>
+    </div>
+
+    <div class="landing-benefits-grid">
+      <article class="landing-benefit reveal" *ngFor="let benefit of benefits">
+        <div class="landing-benefit-icon"><mat-icon>{{ benefit.icon }}</mat-icon></div>
+        <div>
+          <h4>{{ benefit.titleKey | translate }}</h4>
+          <p>{{ benefit.descKey | translate }}</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── Comparison table ────────────────────────────────────── -->
+  <section class="landing-section" id="comparison">
+    <div class="landing-section-header reveal">
+      <span class="landing-eyebrow">{{ 'LANDING.COMPARISON.EYEBROW' | translate }}</span>
+      <h2>{{ 'LANDING.COMPARISON.TITLE' | translate }}</h2>
+      <p>{{ 'LANDING.COMPARISON.SUBTITLE' | translate }}</p>
+    </div>
+
+    <div class="landing-comparison reveal">
+      <table class="landing-comparison-table">
+        <thead>
+          <tr>
+            <th class="col-label"></th>
+            <th class="col-manual">{{ 'LANDING.COMPARISON.COL_MANUAL' | translate }}</th>
+            <th class="col-smart">
+              <span class="landing-brand-icon small"><mat-icon>eco</mat-icon></span>
+              AgroSync
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of comparisonRows">
+            <td class="col-label">{{ row.labelKey | translate }}</td>
+            <td class="col-manual">
+              <mat-icon class="cmp-icon negative">cancel</mat-icon>
+              {{ row.manualKey | translate }}
+            </td>
+            <td class="col-smart">
+              <mat-icon class="cmp-icon positive">check_circle</mat-icon>
+              {{ row.smartKey | translate }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Testimonials ────────────────────────────────────────── -->
+  <section class="landing-section landing-section-alt" id="testimonials">
+    <div class="landing-section-header reveal">
+      <span class="landing-eyebrow">{{ 'LANDING.TESTIMONIALS.EYEBROW' | translate }}</span>
+      <h2>{{ 'LANDING.TESTIMONIALS.TITLE' | translate }}</h2>
+      <p>{{ 'LANDING.TESTIMONIALS.SUBTITLE' | translate }}</p>
+    </div>
+
+    <div class="landing-testimonials-grid">
+      <article class="landing-testimonial reveal" *ngFor="let testimonial of testimonials">
+        <div class="landing-testimonial-stars">
+          <mat-icon *ngFor="let s of ratingStars">star</mat-icon>
+        </div>
+        <p class="landing-testimonial-quote">&ldquo;{{ testimonial.quoteKey | translate }}&rdquo;</p>
+        <div class="landing-testimonial-author">
+          <span class="landing-testimonial-avatar">{{ testimonial.initials }}</span>
+          <div>
+            <strong>{{ testimonial.nameKey | translate }}</strong>
+            <span>{{ testimonial.roleKey | translate }} &middot; {{ testimonial.orgKey | translate }}</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── FAQ ─────────────────────────────────────────────────── -->
+  <section class="landing-section" id="faq">
+    <div class="landing-section-header reveal">
+      <span class="landing-eyebrow">{{ 'LANDING.FAQ.EYEBROW' | translate }}</span>
+      <h2>{{ 'LANDING.FAQ.TITLE' | translate }}</h2>
+    </div>
+
+    <div class="landing-faq reveal">
+      <div class="faq-item" [class.open]="item.open" *ngFor="let item of faqs">
+        <button type="button" class="faq-question" (click)="toggleFaq(item)">
+          <span>{{ item.qKey | translate }}</span>
+          <mat-icon>{{ item.open ? 'remove' : 'add' }}</mat-icon>
+        </button>
+        <div class="faq-answer">
+          <p>{{ item.aKey | translate }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About ───────────────────────────────────────────────── -->
+  <section class="landing-section landing-section-alt landing-about" id="about">
+    <div class="landing-about-icon reveal"><mat-icon>eco</mat-icon></div>
+    <span class="landing-eyebrow">{{ 'LANDING.ABOUT.EYEBROW' | translate }}</span>
+    <h2 class="reveal">{{ 'LANDING.ABOUT.TITLE' | translate }}</h2>
+    <p class="reveal">{{ 'LANDING.ABOUT.DESCRIPTION' | translate }}</p>
+  </section>
+
+  <!-- ── Final CTA ───────────────────────────────────────────── -->
+  <section class="landing-final-cta">
+    <div class="landing-final-cta-card reveal">
+      <h2>{{ 'LANDING.FINAL_CTA.TITLE' | translate }}</h2>
+      <p>{{ 'LANDING.FINAL_CTA.SUBTITLE' | translate }}</p>
+      <div class="landing-hero-actions">
+        <a routerLink="/signup" class="landing-btn landing-btn-primary">
+          {{ 'LANDING.HERO.GET_STARTED' | translate }}
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+        <a routerLink="/login" class="landing-btn landing-btn-outline-light">
+          <mat-icon>person</mat-icon>
+          {{ 'LANDING.HERO.USER_LOGIN' | translate }}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────────────── -->
+  <footer class="landing-footer">
+    <div class="landing-footer-top">
+      <div class="landing-footer-brand">
+        <a routerLink="/" class="landing-brand">
+          <span class="landing-brand-icon"><mat-icon>eco</mat-icon></span>
+          <span class="landing-brand-name">AgroSync</span>
+        </a>
+        <p>{{ 'LANDING.FOOTER.TAGLINE' | translate }}</p>
+      </div>
+
+      <div class="landing-footer-col">
+        <h5>{{ 'LANDING.FOOTER.PRODUCT' | translate }}</h5>
+        <a href="#features">{{ 'LANDING.NAV.FEATURES' | translate }}</a>
+        <a href="#product-tour">{{ 'LANDING.NAV.PRODUCT_TOUR' | translate }}</a>
+        <a href="#how-it-works">{{ 'LANDING.NAV.HOW_IT_WORKS' | translate }}</a>
+        <a href="#comparison">{{ 'LANDING.NAV.COMPARISON' | translate }}</a>
+      </div>
+
+      <div class="landing-footer-col">
+        <h5>{{ 'LANDING.FOOTER.COMPANY' | translate }}</h5>
+        <a href="#about">{{ 'LANDING.NAV.ABOUT' | translate }}</a>
+        <a href="#testimonials">{{ 'LANDING.NAV.TESTIMONIALS' | translate }}</a>
+        <a href="#faq">{{ 'LANDING.NAV.FAQ' | translate }}</a>
+      </div>
+
+      <div class="landing-footer-col">
+        <h5>{{ 'LANDING.FOOTER.ACCOUNT' | translate }}</h5>
+        <a routerLink="/login">{{ 'LANDING.FOOTER.USER_LOGIN' | translate }}</a>
+        <a routerLink="/signup">{{ 'LANDING.FOOTER.GET_STARTED' | translate }}</a>
+      </div>
+    </div>
+
+    <div class="landing-footer-bottom">
+      <p>{{ 'LANDING.FOOTER.COPYRIGHT' | translate: { year } }}</p>
+    </div>
+  </footer>
+
+</div>

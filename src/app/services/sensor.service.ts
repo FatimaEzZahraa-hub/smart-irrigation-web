@@ -19,14 +19,15 @@ export interface SensorHistoryFilters {
 
 export class SensorService {
 
-  api = environment.apiUrl + '/sensors';
+  private readonly api = environment.apiUrl + '/sensors';
 
   constructor(private http: HttpClient) {}
 
   getLatest(deviceId: string) {
 
     return this.http.get(
-      `${this.api}/latest/${deviceId}`
+      `${this.api}/latest/${deviceId}`,
+      { headers: this.getAuthHeaders() }
     );
 
   }

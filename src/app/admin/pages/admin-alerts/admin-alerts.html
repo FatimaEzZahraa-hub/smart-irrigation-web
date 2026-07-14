@@ -1,0 +1,122 @@
+<section class="admin-alerts-page page-content">
+  <header class="page-toolbar">
+    <div>
+      <p class="page-eyebrow">Administration</p>
+      <h2>Alerts</h2>
+    </div>
+
+    <div class="admin-delete-old-controls">
+      <label class="admin-delete-old-label">
+        Older than
+        <input type="number" min="1" class="admin-days-input" [(ngModel)]="deleteOlderThanDays">
+        days
+      </label>
+      <button type="button" class="app-action-btn danger" (click)="openDeleteOldConfirm()" [disabled]="isDeleting">
+        <mat-icon>delete_sweep</mat-icon>
+        Delete old alerts
+      </button>
+    </div>
+  </header>
+
+  <div class="admin-alerts-filters surface-card">
+    <div class="admin-search-box">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search message or type…"
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="applyFilters()"
+      >
+    </div>
+
+    <select class="admin-filter-select" [(ngModel)]="severityFilter" (change)="applyFilters()">
+      <option value="">All severities</option>
+      <option value="info">Info</option>
+      <option value="warning">Warning</option>
+      <option value="critical">Critical</option>
+    </select>
+
+    <select class="admin-filter-select" [(ngModel)]="typeFilter" (change)="onTypeFilterChange()">
+      <option value="">All types</option>
+      <option *ngFor="let type of alertTypes" [value]="type">{{ type }}</option>
+    </select>
+
+    <button type="button" class="app-action-btn" (click)="applyFilters()">
+      <mat-icon>filter_alt</mat-icon>
+      Apply
+    </button>
+  </div>
+
+  <div class="admin-error-banner surface-card" *ngIf="errorMessage">
+    <mat-icon>error_outline</mat-icon>
+    {{ errorMessage }}
+  </div>
+
+  <div class="admin-loading" *ngIf="isLoading">
+    <mat-icon>autorenew</mat-icon>
+    Loading alerts…
+  </div>
+
+  <div class="admin-table-wrap surface-card" *ngIf="!isLoading && filteredAlerts.length > 0">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Message</th>
+          <th>Severity</th>
+          <th>Status</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let alert of paginatedAlerts">
+          <td>{{ alert.alertType }}</td>
+          <td class="admin-alert-message">{{ alert.message }}</td>
+          <td>
+            <span class="admin-severity-badge" [ngClass]="alert.severity">{{ alert.severity }}</span>
+          </td>
+          <td>
+            <span class="admin-status-pill" [class.active]="alert.resolved" [class.inactive]="!alert.resolved">
+              {{ alert.resolved ? 'Resolved' : 'Open' }}
+            </span>
+          </td>
+          <td>{{ alert.createdAt | date:'short' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="admin-pagination">
+      <div class="admin-page-size">
+        <span>Rows per page</span>
+        <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+          <option *ngFor="let option of pageSizeOptions" [value]="option">{{ option }}</option>
+        </select>
+      </div>
+      <div class="admin-page-info">{{ pageStart }}–{{ pageEnd }} of {{ filteredAlerts.length }}</div>
+      <div class="admin-page-controls">
+        <button type="button" (click)="previousPage()" [disabled]="currentPage === 1">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span>{{ currentPage }} / {{ totalPages }}</span>
+        <button type="button" (click)="nextPage()" [disabled]="currentPage === totalPages">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-empty-state surface-card" *ngIf="!isLoading && filteredAlerts.length === 0 && !errorMessage">
+    <mat-icon>notifications_none</mat-icon>
+    <p>No alerts match your filters.</p>
+  </div>
+
+  <app-admin-confirm-dialog
+    *ngIf="showDeleteOldConfirm"
+    title="Delete old alerts"
+    [message]="'Permanently delete all RESOLVED alerts older than ' + deleteOlderThanDays + ' days? This cannot be undone. Unresolved alerts are never deleted.'"
+    confirmLabel="Delete"
+    [danger]="true"
+    (confirmed)="confirmDeleteOld()"
+    (cancelled)="cancelDeleteOld()"
+  ></app-admin-confirm-dialog>
+</section>

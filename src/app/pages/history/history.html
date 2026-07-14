@@ -1,106 +1,201 @@
-<section class="history-page page-content">
-  <header class="page-toolbar">
+﻿<section class="history-page page-content">
+  <header class="history-header page-toolbar">
     <div>
-      <p class="page-eyebrow">{{ 'HISTORY.EYEBROW' | translate }}</p>
+      <p class="history-eyebrow page-eyebrow">{{ 'HISTORY.EYEBROW' | translate }}</p>
       <h2>{{ 'HISTORY.TITLE' | translate }}</h2>
     </div>
-    <button class="app-action-btn" type="button" (click)="applyFilters()" [disabled]="isLoading || !selectedZoneId">
-      <mat-icon>filter_list</mat-icon>
-      {{ 'HISTORY.FILTER' | translate }}
-    </button>
   </header>
 
   <div class="history-content">
-    <div class="history-filters surface-card">
-      <label>
-        <span>{{ 'HISTORY.ZONE' | translate }}</span>
-        <select [(ngModel)]="selectedZoneId" (change)="applyFilters()">
-          <option *ngFor="let zone of zones" [value]="zone.id">{{ getZoneName(zone) }}</option>
-        </select>
-      </label>
-
-      <label>
-        <span>{{ 'HISTORY.START_DATE' | translate }}</span>
-        <input type="date" [(ngModel)]="startDate" (change)="applyFilters()">
-      </label>
-
-      <label>
-        <span>{{ 'HISTORY.END_DATE' | translate }}</span>
-        <input type="date" [(ngModel)]="endDate" (change)="applyFilters()">
-      </label>
-
-      <label>
-        <span>{{ 'HISTORY.DATA_TYPE' | translate }}</span>
-        <select [(ngModel)]="selectedType" (change)="applyFilters()">
-          <option *ngFor="let type of sensorTypes" [value]="type">{{ getTypeLabel(type) | translate }}</option>
-        </select>
-      </label>
-
-      <button class="history-reset-btn" type="button" (click)="resetFilters()" [disabled]="isLoading">
-        {{ 'HISTORY.RESET' | translate }}
-      </button>
-    </div>
-
-    <div class="history-summary">
-      <div class="history-summary-chip">
-        <span class="history-summary-chip-dot" style="background:#22c55e"></span>
-        <span class="history-summary-chip-label">{{ 'HISTORY.AVERAGE_SOIL' | translate }}</span>
-        <span class="history-summary-chip-value">{{ averageSoil }}%</span>
-      </div>
-      <div class="history-summary-chip">
-        <span class="history-summary-chip-dot" style="background:#f59e0b"></span>
-        <span class="history-summary-chip-label">{{ 'HISTORY.AVG_TEMP' | translate }}</span>
-        <span class="history-summary-chip-value">{{ averageTemperature }}&deg;C</span>
-      </div>
-    </div>
-
-    <div class="history-table-card surface-card">
-      <div class="history-table-top">
-        <div class="history-table-top-title">{{ 'HISTORY.TELEMETRY_LOG' | translate }}</div>
-        <span class="history-table-top-count">{{ 'HISTORY.ENTRIES' | translate:{ count: history.length } }}</span>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>{{ 'HISTORY.DATE' | translate }}</th>
-            <th>{{ 'HISTORY.TYPE_LABEL' | translate }}</th>
-            <th>{{ 'DASHBOARD.TEMPERATURE' | translate }}</th>
-            <th>{{ 'HISTORY.HUMIDITY' | translate }}</th>
-          </tr>
-        </thead>
-        <tbody *ngIf="!isLoading && !errorMessage && history.length">
-          <tr *ngFor="let h of history">
-            <td class="td-date">{{ h.enregistre_le | date:'medium' }}</td>
-            <td>{{ getTypeLabel(h.metric_type || selectedType) | translate }}</td>
-            <td>
-              <span class="td-temp">{{ h.temperature }}&deg;C</span>
-            </td>
-            <td>
-              <div class="td-humidity-bar">
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill" [style.width]="getMetricValue(h) + '%' "></div>
-                </div>
-                <span>{{ getMetricValue(h) }}{{ getMetricUnit() }}</span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="history-state" *ngIf="isLoading">
-        <mat-icon>sync</mat-icon>
-        {{ 'HISTORY.LOADING' | translate }}
+    <section
+      class="history-toolbar surface-card"
+      [attr.aria-label]="'HISTORY.FILTERS_LABEL' | translate"
+    >
+      <div class="history-toolbar-dates">
+        <label class="history-date-field">
+          <span>{{ 'HISTORY.START_DATE' | translate }}</span>
+          <input type="date" [(ngModel)]="startDate" (change)="onCustomDateChange()">
+        </label>
+        <span class="history-date-separator" aria-hidden="true">&mdash;</span>
+        <label class="history-date-field">
+          <span>{{ 'HISTORY.END_DATE' | translate }}</span>
+          <input type="date" [(ngModel)]="endDate" (change)="onCustomDateChange()">
+        </label>
       </div>
 
-      <div class="history-state error" *ngIf="!isLoading && errorMessage">
-        <mat-icon>error_outline</mat-icon>
-        {{ errorMessage | translate }}
+      <div class="history-toolbar-actions">
+        <button class="history-btn history-btn-ghost" type="button" (click)="resetFilters()" [disabled]="isLoading">
+          <mat-icon>restart_alt</mat-icon>
+          {{ 'HISTORY.RESET' | translate }}
+        </button>
+        <button
+          class="history-btn history-btn-ghost"
+          type="button"
+          (click)="exportPdf()"
+          [disabled]="isLoading || !filteredRows.length"
+        >
+          <mat-icon>picture_as_pdf</mat-icon>
+          {{ 'HISTORY.EXPORT_PDF' | translate }}
+        </button>
+        <button
+          class="history-btn history-btn-primary"
+          type="button"
+          (click)="exportExcel()"
+          [disabled]="isLoading || !filteredRows.length"
+        >
+          <mat-icon>table_view</mat-icon>
+          {{ 'HISTORY.EXPORT_EXCEL' | translate }}
+        </button>
+      </div>
+    </section>
+
+    <section class="history-summary" [attr.aria-label]="'HISTORY.SUMMARY_LABEL' | translate">
+      <div class="history-summary-card moisture">
+        <div class="history-summary-icon">
+          <mat-icon>water_drop</mat-icon>
+        </div>
+        <div class="history-summary-text">
+          <span class="history-summary-label">{{ 'HISTORY.AVERAGE_SOIL' | translate }}</span>
+          <span class="history-summary-value">{{ averageSoil }}%</span>
+        </div>
+      </div>
+      <div class="history-summary-card temperature">
+        <div class="history-summary-icon">
+          <mat-icon>thermostat</mat-icon>
+        </div>
+        <div class="history-summary-text">
+          <span class="history-summary-label">{{ 'HISTORY.AVG_TEMP' | translate }}</span>
+          <span class="history-summary-value">{{ averageTemperature }}&deg;C</span>
+        </div>
+      </div>
+      <div class="history-summary-card water">
+        <div class="history-summary-icon">
+          <mat-icon>opacity</mat-icon>
+        </div>
+        <div class="history-summary-text">
+          <span class="history-summary-label">{{ 'HISTORY.AVG_WATER_LEVEL' | translate }}</span>
+          <span class="history-summary-value">{{ averageWaterLevel }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="history-table-card surface-card">
+      <div class="history-table-header">
+        <div>
+          <h3 class="history-table-title">{{ 'HISTORY.TABLE_TITLE' | translate }}</h3>
+          <p class="history-table-subtitle">{{ 'HISTORY.TABLE_DESCRIPTION' | translate }}</p>
+        </div>
+        <span class="history-table-count">{{ 'HISTORY.ENTRIES' | translate:{ count: filteredRows.length } }}</span>
       </div>
 
-      <div class="history-state" *ngIf="!isLoading && !errorMessage && !history.length">
-        <mat-icon>inbox</mat-icon>
-        {{ 'HISTORY.EMPTY' | translate }}
+      <div class="history-table-body">
+        <div class="history-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>
+                  <button type="button" class="sort-btn" (click)="sortBy('date')">
+                    {{ 'HISTORY.DATE' | translate }}
+                    <mat-icon>{{ getSortIcon('date') }}</mat-icon>
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="sort-btn" (click)="sortBy('time')">
+                    {{ 'HISTORY.TIME' | translate }}
+                    <mat-icon>{{ getSortIcon('time') }}</mat-icon>
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="sort-btn" (click)="sortBy('humidity')">
+                    {{ 'HISTORY.HUMIDITY' | translate }}
+                    <mat-icon>{{ getSortIcon('humidity') }}</mat-icon>
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="sort-btn" (click)="sortBy('temperature')">
+                    {{ 'HISTORY.TEMPERATURE' | translate }}
+                    <mat-icon>{{ getSortIcon('temperature') }}</mat-icon>
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="sort-btn" (click)="sortBy('waterLevel')">
+                    {{ 'HISTORY.WATER_LEVEL' | translate }}
+                    <mat-icon>{{ getSortIcon('waterLevel') }}</mat-icon>
+                  </button>
+                </th>
+                <th>
+                  <button type="button" class="sort-btn" (click)="sortBy('pumpStatus')">
+                    {{ 'HISTORY.PUMP_STATE' | translate }}
+                    <mat-icon>{{ getSortIcon('pumpStatus') }}</mat-icon>
+                  </button>
+                </th>
+              </tr>
+            </thead>
+            <tbody *ngIf="!isLoading && !errorMessage && paginatedRows.length">
+              <tr *ngFor="let row of paginatedRows">
+                <td class="td-date">{{ row.dateText }}</td>
+                <td class="td-date">{{ row.timeText }}</td>
+                <td>
+                  <div class="td-humidity">
+                    <div class="mini-bar-track">
+                      <div class="mini-bar-fill" [style.width.%]="row.humidity"></div>
+                    </div>
+                    <span>{{ row.humidity }}%</span>
+                  </div>
+                </td>
+                <td><span class="td-temp">{{ row.temperature }}&deg;C</span></td>
+                <td>{{ row.waterLevel === null ? ('HISTORY.NOT_AVAILABLE' | translate) : (row.waterLevel + '%') }}</td>
+                <td>
+                  <span class="pump-status-badge" [class]="getPumpStatusClass(row.pumpStatus)">
+                    {{ getPumpStatusLabel(row.pumpStatus) | translate }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="history-state history-state-loading" *ngIf="isLoading">
+            <mat-icon class="history-loading-icon">sync</mat-icon>
+            <span>{{ 'HISTORY.LOADING' | translate }}</span>
+          </div>
+
+          <div class="history-state history-state-error" *ngIf="!isLoading && errorMessage">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMessage | translate }}</span>
+          </div>
+
+          <div class="history-state history-state-empty" *ngIf="!isLoading && !errorMessage && !filteredRows.length">
+            <div class="history-empty-icon">
+              <mat-icon>analytics</mat-icon>
+            </div>
+            <strong>{{ 'HISTORY.EMPTY' | translate }}</strong>
+            <span>{{ 'HISTORY.EMPTY_HELP' | translate }}</span>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <div class="history-pagination" *ngIf="!isLoading && !errorMessage && filteredRows.length">
+        <div class="history-page-size">
+          <span>{{ 'HISTORY.ROWS_PER_PAGE' | translate }}</span>
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+            <option *ngFor="let option of pageSizeOptions" [value]="option">{{ option }}</option>
+          </select>
+        </div>
+
+        <div class="history-page-info">
+          {{ 'HISTORY.PAGE_INFO' | translate:{ start: pageStart, end: pageEnd, total: filteredRows.length } }}
+        </div>
+
+        <div class="history-page-controls">
+          <button type="button" (click)="previousPage()" [disabled]="currentPage === 1" [attr.aria-label]="'HISTORY.PREVIOUS_PAGE' | translate">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span>{{ currentPage }} / {{ totalPages }}</span>
+          <button type="button" (click)="nextPage()" [disabled]="currentPage === totalPages" [attr.aria-label]="'HISTORY.NEXT_PAGE' | translate">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+    </section>
   </div>
 </section>

@@ -7,50 +7,234 @@
   </header>
 
   <div class="pump-page-body">
-    <div class="pump-card surface-card" [class.is-on]="status === 'ON'">
-      <div class="pump-card-icon">
-        <mat-icon>water_drop</mat-icon>
-      </div>
-      <h1 class="pump-card-title">{{ 'PUMP.WATER_PUMP' | translate }}</h1>
-
-      <div class="pump-status-display" [class.on]="status === 'ON'" [class.off]="status === 'OFF'">
-        <div class="pump-status-indicator" [class.on]="status === 'ON'" [class.off]="status === 'OFF'">
-          <span class="dot"></span>
-        </div>
-        <div>
-          <div class="pump-status-label" [class.on]="status === 'ON'" [class.off]="status === 'OFF'">
-            {{ status }}
+    <div class="pump-shell">
+      <section class="pump-status-panel surface-card" [class.is-on]="status === 'ON'">
+        <div class="pump-status-heading">
+          <div class="pump-card-icon" aria-hidden="true">
+            <mat-icon>water_pump</mat-icon>
           </div>
-          <div class="pump-status-sublabel">
-            {{ (status === 'ON' ? 'PUMP.RUNNING' : 'PUMP.IDLE') | translate }}
+          <div>
+            <h1 class="pump-card-title">{{ 'PUMP.WATER_PUMP' | translate }}</h1>
+            <p>{{ 'PUMP.HEADER_DESCRIPTION' | translate }}</p>
           </div>
         </div>
-      </div>
 
-      <div class="pump-btns">
-        <button class="pump-btn pump-btn-on app-action-btn primary" (click)="turnOn()">
-          <mat-icon>play_arrow</mat-icon>
-          {{ 'PUMP.TURN_ON' | translate }}
-        </button>
-        <button class="pump-btn pump-btn-off app-action-btn danger" (click)="turnOff()">
-          <mat-icon>stop</mat-icon>
-          {{ 'PUMP.TURN_OFF' | translate }}
-        </button>
-      </div>
+        <div class="pump-state-grid">
+          <div class="pump-state-tile" [class.on]="status === 'ON' && !pumpTransition" [class.off]="status === 'OFF' && !pumpTransition" [class.pending]="pumpTransition">
+            <div class="pump-state-icon" aria-hidden="true">
+              <span class="dot"></span>
+            </div>
+            <div>
+              <span>{{ 'PUMP.CURRENT_PUMP_STATUS' | translate }}</span>
+              <strong>{{ pumpStatusLabelKey | translate }}</strong>
+              <small>{{ (status === 'ON' ? 'PUMP.RUNNING' : 'PUMP.IDLE') | translate }}</small>
+            </div>
+          </div>
 
-      <div class="pump-info-row">
-        <div class="pump-info-item">
-          <div class="pump-info-value">Zone A</div>
-          <div class="pump-info-label">{{ 'PUMP.ZONE' | translate }}</div>
+          <div class="pump-state-tile" [class.auto-on]="automaticMode">
+            <div class="pump-state-icon" aria-hidden="true">
+              <mat-icon>auto_mode</mat-icon>
+            </div>
+            <div>
+              <span>{{ 'PUMP.CURRENT_AUTO_STATUS' | translate }}</span>
+              <strong>{{ (automaticMode ? 'PUMP.ENABLED' : 'PUMP.DISABLED') | translate }}</strong>
+              <small>{{ 'PUMP.SINGLE_ZONE' | translate }}</small>
+            </div>
+          </div>
+
+          <div class="pump-state-tile sensor-tile" [class.stale]="isSensorStale && !sensorUnavailable" [class.unavailable]="sensorUnavailable">
+            <div class="pump-state-icon" aria-hidden="true">
+              <mat-icon>water_drop</mat-icon>
+            </div>
+            <div>
+              <span>{{ 'PUMP.SOIL_MOISTURE' | translate }}</span>
+              <ng-container *ngIf="!sensorUnavailable; else noSensorData">
+                <strong>{{ soilMoisture }}%</strong>
+                <small>
+                  <span class="status-dot" [class.online]="isDeviceOnline" [class.offline]="!isDeviceOnline"></span>
+                  {{ (isDeviceOnline ? 'PUMP.DEVICE_ONLINE' : 'PUMP.DEVICE_OFFLINE') | translate }}
+                  &middot; {{ 'PUMP.LAST_UPDATE' | translate }} {{ lastSensorUpdate | date:'shortTime' }}
+                </small>
+                <small [class.stale-warning]="isSensorStale">
+                  {{ (isSensorStale ? 'PUMP.SENSOR_STALE_WARNING' : (isBelowThreshold ? 'PUMP.BELOW_THRESHOLD' : 'PUMP.ABOVE_THRESHOLD')) | translate }}
+                </small>
+              </ng-container>
+              <ng-template #noSensorData>
+                <strong>{{ 'PUMP.SENSOR_UNAVAILABLE' | translate }}</strong>
+                <small class="stale-warning">
+                  <span class="status-dot offline"></span>
+                  {{ 'PUMP.DEVICE_OFFLINE' | translate }} &middot; {{ 'PUMP.SENSOR_STALE_WARNING' | translate }}
+                </small>
+              </ng-template>
+            </div>
+          </div>
+
+          <div class="pump-state-tile">
+            <div class="pump-state-icon" aria-hidden="true">
+              <mat-icon>history</mat-icon>
+            </div>
+            <div>
+              <span>{{ 'PUMP.LAST_ACTIVATION' | translate }}</span>
+              <strong class="date-value" *ngIf="lastActivation">{{ lastActivation | date:'short' }}</strong>
+              <strong class="date-value" *ngIf="!lastActivation">{{ 'PUMP.NO_ACTIVATION_YET' | translate }}</strong>
+            </div>
+          </div>
+
+          <div class="pump-state-tile">
+            <div class="pump-state-icon" aria-hidden="true">
+              <mat-icon>update</mat-icon>
+            </div>
+            <div>
+              <span>{{ 'PUMP.LAST_CONFIG_UPDATE' | translate }}</span>
+              <strong class="date-value" *ngIf="settingsUpdatedAt">{{ settingsUpdatedAt | date:'short' }}</strong>
+              <strong class="date-value" *ngIf="!settingsUpdatedAt">{{ 'PUMP.NOT_CONFIGURED_YET' | translate }}</strong>
+            </div>
+          </div>
         </div>
-        <div class="pump-info-item">
-          <div class="pump-info-value">{{ 'PUMP.MANUAL' | translate }}</div>
-          <div class="pump-info-label">{{ 'PUMP.MODE' | translate }}</div>
+
+        <p class="mode-note" [class.is-auto]="automaticMode">
+          <mat-icon aria-hidden="true">{{ automaticMode ? 'auto_mode' : 'pan_tool' }}</mat-icon>
+          <span>
+            <strong>{{ (automaticMode ? 'PUMP.NOTE_AUTO_ACTIVE' : 'PUMP.NOTE_MANUAL_ACTIVE') | translate }}</strong>
+            <small *ngIf="automaticMode">{{ 'PUMP.NOTE_AUTO_DETAIL' | translate }}</small>
+          </span>
+        </p>
+
+        <div class="pump-feedback" [class.is-error]="feedbackType === 'error'" role="status" aria-live="polite">
+          <mat-icon>{{ feedbackType === 'error' ? 'error' : 'check_circle' }}</mat-icon>
+          {{ feedbackKey | translate }}
         </div>
-        <div class="pump-info-item">
-          <div class="pump-info-value">ESP32</div>
-          <div class="pump-info-label">{{ 'PUMP.DEVICE' | translate }}</div>
+      </section>
+
+      <section class="pump-panel surface-card">
+        <div class="pump-panel-header">
+          <div class="pump-panel-title">
+            <mat-icon aria-hidden="true">pan_tool</mat-icon>
+            <div>
+              <h3>{{ 'PUMP.MANUAL_CONTROL' | translate }}</h3>
+              <p>{{ 'PUMP.MANUAL_DESCRIPTION' | translate }}</p>
+            </div>
+          </div>
         </div>
+        <div class="pump-btns">
+          <button class="pump-btn pump-btn-on app-action-btn primary" type="button" (click)="confirmTurnOn()" [disabled]="status === 'ON'" [attr.aria-label]="'PUMP.TURN_ON' | translate">
+            <mat-icon>play_arrow</mat-icon>
+            {{ 'PUMP.TURN_ON' | translate }}
+          </button>
+          <button class="pump-btn pump-btn-off app-action-btn danger" type="button" (click)="confirmTurnOff()" [disabled]="status === 'OFF'" [attr.aria-label]="'PUMP.TURN_OFF' | translate">
+            <mat-icon>stop</mat-icon>
+            {{ 'PUMP.TURN_OFF' | translate }}
+          </button>
+        </div>
+      </section>
+
+      <section class="pump-panel surface-card">
+        <div class="pump-panel-header">
+          <div class="pump-panel-title">
+            <mat-icon aria-hidden="true">auto_mode</mat-icon>
+            <div>
+              <h3>{{ 'PUMP.AUTOMATIC_CONTROL' | translate }}</h3>
+              <p>{{ 'PUMP.AUTOMATIC_DESCRIPTION' | translate }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="auto-control-row">
+          <div>
+            <strong>{{ 'PUMP.AUTO_MODE' | translate }}</strong>
+            <span>{{ 'PUMP.AUTO_MODE_HELP' | translate }}</span>
+          </div>
+          <button
+            class="toggle-switch"
+            type="button"
+            role="switch"
+            [attr.aria-checked]="automaticMode"
+            [attr.aria-label]="'PUMP.AUTO_MODE' | translate"
+            [class.is-active]="automaticMode"
+            (click)="confirmToggleAutomaticMode()"
+          >
+            <span></span>
+          </button>
+        </div>
+      </section>
+
+      <section class="pump-panel surface-card">
+        <div class="pump-panel-header">
+          <div class="pump-panel-title">
+            <mat-icon aria-hidden="true">settings</mat-icon>
+            <div>
+              <h3>{{ 'PUMP.SETTINGS_SECTION' | translate }}</h3>
+              <p>{{ 'PUMP.SETTINGS_DESCRIPTION' | translate }}</p>
+            </div>
+          </div>
+        </div>
+        <form class="settings-grid" (ngSubmit)="saveSettings()">
+          <label class="field">
+            <span>{{ 'PUMP.MIN_HUMIDITY' | translate }}</span>
+            <div class="input-unit">
+              <input type="number" name="humidityThreshold" min="10" max="90" [(ngModel)]="humidityThreshold" [attr.aria-label]="'PUMP.MIN_HUMIDITY' | translate">
+              <span>%</span>
+            </div>
+          </label>
+
+          <label class="field">
+            <span>{{ 'PUMP.IRRIGATION_DURATION' | translate }}</span>
+            <div class="input-unit">
+              <input type="number" name="irrigationDuration" min="1" max="120" [(ngModel)]="irrigationDuration" [attr.aria-label]="'PUMP.IRRIGATION_DURATION' | translate">
+              <span>min</span>
+            </div>
+          </label>
+
+          <label class="field">
+            <span>{{ 'PUMP.PLANT_NAME' | translate }}</span>
+            <div class="input-unit">
+              <input type="text" name="plantName" maxlength="100" [(ngModel)]="plantName" [attr.aria-label]="'PUMP.PLANT_NAME' | translate">
+            </div>
+          </label>
+
+          <label class="field">
+            <span>{{ 'PUMP.PLANTING_DATE' | translate }}</span>
+            <div class="input-unit">
+              <input type="date" name="plantingDate" [attr.max]="today" [(ngModel)]="plantingDate" [attr.aria-label]="'PUMP.PLANTING_DATE' | translate">
+            </div>
+          </label>
+
+          <button class="save-settings-btn app-action-btn primary" type="submit">
+            <mat-icon>save</mat-icon>
+            {{ 'PUMP.SAVE_SETTINGS' | translate }}
+          </button>
+        </form>
+      </section>
+
+      <section class="pump-panel surface-card" *ngIf="pumpHistory.length > 0">
+        <div class="pump-panel-header">
+          <div class="pump-panel-title">
+            <mat-icon aria-hidden="true">timeline</mat-icon>
+            <div>
+              <h3>{{ 'PUMP.ACTIVITY_TITLE' | translate }}</h3>
+              <p>{{ 'PUMP.ACTIVITY_DESCRIPTION' | translate }}</p>
+            </div>
+          </div>
+        </div>
+        <ul class="activity-timeline">
+          <li class="activity-item" *ngFor="let entry of recentActivity" [class.on]="entry.action === 'ON'">
+            <span class="activity-dot"></span>
+            <div>
+              <strong>{{ (entry.action === 'ON' ? 'PUMP.EVENT_STARTED' : 'PUMP.EVENT_STOPPED') | translate }}</strong>
+              <span>{{ triggeredByKey(entry) | translate }} &middot; {{ eventDate(entry) | date:'short' }}</span>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <div class="confirm-overlay" *ngIf="confirmRequest" (click)="cancelConfirmation()">
+    <div class="confirm-dialog surface-card" role="alertdialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <h4>{{ confirmRequest.titleKey | translate }}</h4>
+      <p>{{ confirmRequest.messageKey | translate }}</p>
+      <div class="confirm-dialog-actions">
+        <button class="app-action-btn" type="button" (click)="cancelConfirmation()">{{ 'PUMP.CANCEL' | translate }}</button>
+        <button class="app-action-btn primary" type="button" (click)="acceptConfirmation()">{{ confirmRequest.confirmKey | translate }}</button>
       </div>
     </div>
   </div>

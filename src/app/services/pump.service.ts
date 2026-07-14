@@ -1,41 +1,38 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable({
-providedIn:'root'
+  providedIn: 'root'
 })
+export class PumpService {
 
-export class PumpService{
+  private readonly api = `${environment.apiUrl}/pump`;
 
-api='http://localhost:3000/pump';
+  constructor(private http: HttpClient) {}
 
-constructor(private http:HttpClient){}
+  turnOn(deviceId: string) {
+    return this.http.post(`${this.api}/on`, { deviceId }, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-turnOn(deviceId:string){
+  turnOff(deviceId: string) {
+    return this.http.post(`${this.api}/off`, { deviceId }, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-return this.http.post(
-`${this.api}/on`,
-{deviceId}
-);
+  history(deviceId: string) {
+    return this.http.get(`${this.api}/history/${deviceId}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-}
-
-turnOff(deviceId:string){
-
-return this.http.post(
-`${this.api}/off`,
-{deviceId}
-);
-
-}
-
-history(deviceId:string){
-
-return this.http.get(
-`${this.api}/history/${deviceId}`
-);
-
-}
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
+  }
 
 }

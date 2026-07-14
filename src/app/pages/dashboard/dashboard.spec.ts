@@ -6,6 +6,7 @@ import { commonTestProviders } from '../../testing/test-providers';
 import { DeviceService } from '../../services/device.service';
 import { SensorService } from '../../services/sensor.service';
 import { WeatherService } from '../../services/weather.service';
+import { AlertStateService } from '../../services/alert-state.service';
 
 describe('Dashboard', () => {
   let component: Dashboard;
@@ -43,6 +44,12 @@ describe('Dashboard', () => {
               description: 'clear',
               icon: '01d'
             })
+          }
+        },
+        {
+          provide: AlertStateService,
+          useValue: {
+            alerts$: of([])
           }
         }
       ]

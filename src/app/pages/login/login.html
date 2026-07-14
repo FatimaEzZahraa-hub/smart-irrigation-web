@@ -1,7 +1,7 @@
 <div class="login-container">
   <div class="login-brand">
     <div class="brand-logo">
-      <div class="brand-logo-icon">🌿</div>
+      <div class="brand-logo-icon"><mat-icon>eco</mat-icon></div>
       <span class="brand-logo-name">AgroSync</span>
     </div>
 
@@ -50,14 +50,25 @@
 
         <div class="form-group">
           <label class="form-label" for="login-password">{{ 'AUTH.PASSWORD' | translate }}</label>
-          <input
-            id="login-password"
-            class="form-input"
-            type="password"
-            formControlName="password"
-            autocomplete="current-password"
-            placeholder="••••••••"
-          >
+          <div class="form-input-wrapper">
+            <input
+              id="login-password"
+              class="form-input"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="current-password"
+              placeholder="••••••••"
+            >
+            <button
+              type="button"
+              class="form-input-toggle"
+              (click)="showPassword = !showPassword"
+              [attr.aria-label]="(showPassword ? 'AUTH.HIDE_PASSWORD' : 'AUTH.SHOW_PASSWORD') | translate"
+              tabindex="-1"
+            >
+              <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
         </div>
 
         <div *ngIf="errorMessage" class="form-message form-message-error">

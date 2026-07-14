@@ -1,0 +1,100 @@
+<section class="admin-dashboard-content page-content">
+  <header class="page-toolbar">
+    <div>
+      <p class="page-eyebrow">Overview</p>
+      <h2>Admin Dashboard</h2>
+    </div>
+  </header>
+
+  <div class="admin-dashboard-error surface-card" *ngIf="errorMessage">
+    <mat-icon>error_outline</mat-icon>
+    {{ errorMessage }}
+  </div>
+
+  <div class="admin-loading" *ngIf="isLoading">
+    <mat-icon>autorenew</mat-icon>
+    Loading dashboard…
+  </div>
+
+  <ng-container *ngIf="summary && !isLoading">
+    <div class="admin-kpi-grid">
+      <article class="admin-kpi-card green">
+        <div class="admin-kpi-card-header">
+          <span class="admin-kpi-card-label">Total Users</span>
+          <div class="admin-kpi-card-icon"><mat-icon>group</mat-icon></div>
+        </div>
+        <div class="admin-kpi-card-value">{{ summary.totalUsers }}</div>
+        <div class="admin-kpi-card-footer">{{ summary.activeUsers }} active</div>
+      </article>
+
+      <article class="admin-kpi-card blue">
+        <div class="admin-kpi-card-header">
+          <span class="admin-kpi-card-label">Total Devices</span>
+          <div class="admin-kpi-card-icon"><mat-icon>sensors</mat-icon></div>
+        </div>
+        <div class="admin-kpi-card-value">{{ summary.totalDevices }}</div>
+        <div class="admin-kpi-card-footer">{{ summary.activeDevices }} active</div>
+      </article>
+
+      <article class="admin-kpi-card teal">
+        <div class="admin-kpi-card-header">
+          <span class="admin-kpi-card-label">Active Devices</span>
+          <div class="admin-kpi-card-icon"><mat-icon>toggle_on</mat-icon></div>
+        </div>
+        <div class="admin-kpi-card-value">{{ summary.activeDevices }}</div>
+        <div class="admin-kpi-card-footer">out of {{ summary.totalDevices }}</div>
+      </article>
+
+      <article class="admin-kpi-card orange">
+        <div class="admin-kpi-card-header">
+          <span class="admin-kpi-card-label">Total Alerts</span>
+          <div class="admin-kpi-card-icon"><mat-icon>notifications_active</mat-icon></div>
+        </div>
+        <div class="admin-kpi-card-value">{{ summary.totalAlerts }}</div>
+        <div class="admin-kpi-card-footer">all severities</div>
+      </article>
+
+      <article class="admin-kpi-card teal">
+        <div class="admin-kpi-card-header">
+          <span class="admin-kpi-card-label">Total Sensor Readings</span>
+          <div class="admin-kpi-card-icon"><mat-icon>query_stats</mat-icon></div>
+        </div>
+        <div class="admin-kpi-card-value">{{ summary.totalSensorReadings }}</div>
+        <div class="admin-kpi-card-footer">from MongoDB</div>
+      </article>
+
+      <article class="admin-kpi-card green">
+        <div class="admin-kpi-card-header">
+          <span class="admin-kpi-card-label">Pump Activations</span>
+          <div class="admin-kpi-card-icon"><mat-icon>water_pump</mat-icon></div>
+        </div>
+        <div class="admin-kpi-card-value">{{ summary.totalPumpActivations }}</div>
+        <div class="admin-kpi-card-footer">total ON events</div>
+      </article>
+    </div>
+  </ng-container>
+
+  <section class="admin-recent-alerts">
+    <div class="admin-recent-alerts-header">
+      <p class="section-heading">Recent Alerts</p>
+      <a routerLink="/admin/alerts" class="app-action-btn">
+        <mat-icon>arrow_forward</mat-icon>
+        View all
+      </a>
+    </div>
+
+    <div class="admin-alert-row surface-card" *ngFor="let alert of recentAlerts" [attr.data-severity]="alert.severity">
+      <span class="admin-alert-severity-dot" [ngClass]="alert.severity"></span>
+      <div class="admin-alert-row-body">
+        <strong>{{ alert.alertType }}</strong>
+        <span>{{ alert.message }}</span>
+      </div>
+      <span class="admin-alert-row-date">{{ alert.createdAt | date:'short' }}</span>
+    </div>
+
+    <div class="admin-empty-state surface-card" *ngIf="!alertsLoading && recentAlerts.length === 0">
+      <mat-icon>notifications_none</mat-icon>
+      <p>No alerts to show.</p>
+    </div>
+  </section>
+</section>

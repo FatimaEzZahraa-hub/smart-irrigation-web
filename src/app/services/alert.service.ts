@@ -1,33 +1,32 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable({
-providedIn:'root'
+  providedIn: 'root'
 })
+export class AlertService {
 
-export class AlertService{
+  private readonly api = `${environment.apiUrl}/alerts`;
 
-api='http://localhost:3000/alerts';
+  constructor(private http: HttpClient) {}
 
-constructor(private http:HttpClient){}
+  getAll() {
+    return this.http.get(this.api, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-getAll(){
+  resolve(id: string) {
+    return this.http.patch(`${this.api}/${id}/resolve`, {}, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
-return this.http.get(this.api);
-
-}
-
-resolve(id:number){
-
-return this.http.patch(
-
-`${this.api}/${id}/resolve`,
-
-{}
-
-);
-
-}
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
+  }
 
 }

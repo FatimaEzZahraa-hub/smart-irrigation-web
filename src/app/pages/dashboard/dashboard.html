@@ -1,43 +1,56 @@
 <section class="dashboard-content page-content">
   <section class="top-summary-card surface-card">
     <div>
-      <p class="eyebrow">{{ 'DASHBOARD.EYEBROW' | translate }}</p>
-      <h2>{{ 'DASHBOARD.TITLE' | translate }}</h2>
+      <p class="page-eyebrow">{{ 'DASHBOARD.EYEBROW' | translate }}</p>
+      <h2>{{ dashboardHeadlineKey | translate }}</h2>
     </div>
 
-    <label class="zone-selector" *ngIf="zones.length > 0">
-      <span>{{ 'DASHBOARD.SELECT_ZONE' | translate }}</span>
-      <select [value]="selectedZoneId" (change)="onZoneChange($event)">
-        <option *ngFor="let zone of zones" [value]="zone.id">
-          {{ zone.nom || zone.emplacement || ('DASHBOARD.DEFAULT_ZONE' | translate) }}
-        </option>
-      </select>
-    </label>
+    <div class="dashboard-error" *ngIf="zonesError">
+      <mat-icon>error_outline</mat-icon>
+      {{ zonesError | translate }}
+    </div>
   </section>
+
+  <!-- Summary moved to bottom: retained here earlier for reference -->
 
   <section>
     <p class="section-heading">{{ 'DASHBOARD.LIVE_READINGS' | translate }}</p>
     <div class="kpi-grid">
-      <article class="kpi-card green">
+      <article class="kpi-card" [ngClass]="soilStatusClass">
         <div class="kpi-card-header">
-          <span class="kpi-card-label">{{ 'DASHBOARD.SOIL_HUMIDITY' | translate }}</span>
+          <span class="kpi-card-label">
+            {{ 'DASHBOARD.SOIL_HUMIDITY' | translate }}
+            <button
+              type="button"
+              class="info-icon"
+              [matTooltip]="'DASHBOARD.TOOLTIPS.SOIL_MOISTURE' | translate"
+              matTooltipPosition="below"
+              matTooltipClass="app-tooltip"
+              [attr.aria-label]="'DASHBOARD.TOOLTIPS.SOIL_MOISTURE' | translate"
+            ><mat-icon aria-hidden="true">info</mat-icon></button>
+          </span>
           <div class="kpi-card-icon"><mat-icon>grass</mat-icon></div>
         </div>
-        <div class="kpi-card-value">{{ humiditeSol }}<span class="kpi-card-unit">%</span></div>
+        <div class="kpi-card-value">{{ soilHumidity }}<span class="kpi-card-unit">%</span></div>
+        <div class="kpi-progress">
+          <div class="kpi-progress-fill" [style.width.%]="soilHumidity"></div>
+        </div>
         <div class="kpi-card-footer">
-          <span class="kpi-card-trend-label">{{ soilStatusKey | translate }}</span>
+          <span class="kpi-status-pill">
+            <span class="kpi-status-dot"></span>
+            {{ soilStatusKey | translate }}
+          </span>
         </div>
       </article>
 
-      <article class="kpi-card amber">
+      <article class="kpi-card orange">
         <div class="kpi-card-header">
           <span class="kpi-card-label">{{ 'DASHBOARD.TEMPERATURE' | translate }}</span>
           <div class="kpi-card-icon"><mat-icon>device_thermostat</mat-icon></div>
         </div>
         <div class="kpi-card-value">{{ temperature }}<span class="kpi-card-unit">&deg;C</span></div>
         <div class="kpi-card-footer">
-          <span class="kpi-card-trend neutral">0.2&deg;</span>
-          <span class="kpi-card-trend-label">{{ 'DASHBOARD.STABLE' | translate }}</span>
+          <span class="kpi-status-pill neutral">{{ 'DASHBOARD.STABLE' | translate }}</span>
         </div>
       </article>
 
@@ -46,25 +59,36 @@
           <span class="kpi-card-label">{{ 'DASHBOARD.AIR_HUMIDITY' | translate }}</span>
           <div class="kpi-card-icon"><mat-icon>water_drop</mat-icon></div>
         </div>
-        <div class="kpi-card-value">{{ humiditeAir }}<span class="kpi-card-unit">%</span></div>
+        <div class="kpi-card-value">{{ airHumidity }}<span class="kpi-card-unit">%</span></div>
         <div class="kpi-card-footer">
-          <span class="kpi-card-trend-label">{{ 'DASHBOARD.SINCE_LAST_HOUR' | translate }}</span>
+          <span class="kpi-status-pill neutral">{{ 'DASHBOARD.SINCE_LAST_HOUR' | translate }}</span>
         </div>
       </article>
 
-      <article class="kpi-card purple">
+      <article class="kpi-card teal" [ngClass]="pumpStatus === 'ON' ? 'active' : ''">
         <div class="kpi-card-header">
-          <span class="kpi-card-label">{{ 'DASHBOARD.PUMP_STATUS' | translate }}</span>
-          <div class="kpi-card-icon"><mat-icon>power_settings_new</mat-icon></div>
+          <span class="kpi-card-label">
+            {{ 'DASHBOARD.PUMP_STATUS' | translate }}
+            <button
+              type="button"
+              class="info-icon"
+              [matTooltip]="'DASHBOARD.TOOLTIPS.PUMP_STATUS' | translate"
+              matTooltipPosition="below"
+              matTooltipClass="app-tooltip"
+              [attr.aria-label]="'DASHBOARD.TOOLTIPS.PUMP_STATUS' | translate"
+            ><mat-icon aria-hidden="true">info</mat-icon></button>
+          </span>
+          <div class="kpi-card-icon"><mat-icon>water_pump</mat-icon></div>
         </div>
         <div class="kpi-card-value">
           <div class="pump-status-badge">
-            <span class="pump-dot" [class.on]="pompe === 'ON'" [class.off]="pompe === 'OFF'"></span>
-            {{ pompe }}
+            <span class="pump-dot" [class.on]="pumpStatus === 'ON'" [class.off]="pumpStatus === 'OFF'"></span>
+            {{ (pumpStatus === 'ON' ? 'PUMP.STATUS_ON' : 'PUMP.STATUS_OFF') | translate }}
           </div>
         </div>
-        <div class="kpi-card-footer">
-          <span class="kpi-card-trend-label">{{ 'DASHBOARD.MANUAL_MODE_ACTIVE' | translate }}</span>
+        <div class="kpi-card-footer pump-footer">
+          <span class="kpi-status-pill" [ngClass]="pumpStatus === 'ON' ? 'active' : 'neutral'">{{ pumpModeKey | translate }}</span>
+          <span class="kpi-card-trend-label" *ngIf="lastPumpAction">{{ 'DASHBOARD.SUMMARY.LAST_ACTION' | translate }} {{ lastPumpAction | date:'shortTime' }}</span>
         </div>
       </article>
     </div>
@@ -84,7 +108,7 @@
       </div>
 
       <div class="soil-compact-body">
-        <div class="soil-sensor" [style.--soil-level]="humiditeSol + '%'">
+        <div class="soil-sensor" [style.--soil-level]="soilHumidity + '%'">
           <div class="soil-ring">
             <span class="soil-node node-top"></span>
             <span class="soil-node node-right"></span>
@@ -92,7 +116,7 @@
             <span class="soil-node node-left"></span>
             <div class="soil-core">
               <mat-icon>grass</mat-icon>
-              <strong>{{ humiditeSol }}%</strong>
+              <strong>{{ soilHumidity }}%</strong>
             </div>
           </div>
         </div>
@@ -122,7 +146,17 @@
         <ng-container *ngIf="weather && !weatherError; else premiumWeatherErrorTpl">
           <div class="weather-main">
             <div>
-              <p class="section-heading">{{ 'DASHBOARD.WEATHER.TITLE' | translate }}</p>
+              <p class="section-heading">
+                {{ 'DASHBOARD.WEATHER.TITLE' | translate }}
+                <button
+                  type="button"
+                  class="info-icon"
+                  [matTooltip]="'DASHBOARD.TOOLTIPS.WEATHER' | translate"
+                  matTooltipPosition="below"
+                  matTooltipClass="app-tooltip"
+                  [attr.aria-label]="'DASHBOARD.TOOLTIPS.WEATHER' | translate"
+                ><mat-icon aria-hidden="true">info</mat-icon></button>
+              </p>
               <p class="weather-location">{{ selectedZoneLabel }}</p>
             </div>
 
@@ -163,25 +197,107 @@
     </article>
   </section>
 
-  <section>
-    <p class="section-heading">{{ 'DASHBOARD.QUICK_ACTIONS' | translate }}</p>
-    <div class="quick-actions">
-      <a routerLink="/pump-control" class="quick-action-btn primary">
-        <mat-icon>water_drop</mat-icon>
-        {{ 'DASHBOARD.CONTROL_PUMP' | translate }}
-      </a>
-      <a routerLink="/history" class="quick-action-btn">
-        <mat-icon>query_stats</mat-icon>
-        {{ 'DASHBOARD.VIEW_HISTORY' | translate }}
-      </a>
-      <a routerLink="/alerts" class="quick-action-btn">
-        <mat-icon>notifications_active</mat-icon>
-        {{ 'DASHBOARD.VIEW_ALERTS' | translate }}
-      </a>
-      <a routerLink="/settings" class="quick-action-btn">
-        <mat-icon>tune</mat-icon>
-        {{ 'NAV.SETTINGS' | translate }}
-      </a>
+  <section class="field-intelligence-grid charts-grid">
+    <article class="chart-card surface-card">
+      <p class="section-heading">{{ 'DASHBOARD.CHARTS.SOIL_HISTORY_TITLE' | translate }}</p>
+      <div class="chart-canvas-wrapper" [class.is-empty]="soilHistory.length === 0">
+        <canvas #soilHistoryCanvas></canvas>
+        <span class="chart-empty-state" *ngIf="soilHistory.length === 0">{{ 'DASHBOARD.CHARTS.SOIL_HISTORY_EMPTY' | translate }}</span>
+      </div>
+    </article>
+
+    <article class="chart-card surface-card">
+      <p class="section-heading">{{ 'DASHBOARD.CHARTS.ALERTS_BY_SEVERITY_TITLE' | translate }}</p>
+      <div class="chart-canvas-wrapper" [class.is-empty]="alerts.length === 0">
+        <canvas #alertsSeverityCanvas></canvas>
+        <span class="chart-empty-state" *ngIf="alerts.length === 0">{{ 'DASHBOARD.CHARTS.ALERTS_EMPTY' | translate }}</span>
+      </div>
+    </article>
+  </section>
+  
+  <!-- Farm Summary: moved to bottom to serve as final overview -->
+  <section class="farm-summary-card surface-card">
+    <div class="farm-summary-header">
+      <div>
+        <p class="section-heading">
+          {{ 'DASHBOARD.SUMMARY.TITLE' | translate }}
+          <button
+            type="button"
+            class="info-icon"
+            [matTooltip]="'DASHBOARD.TOOLTIPS.FARM_SUMMARY' | translate"
+            matTooltipPosition="below"
+            matTooltipClass="app-tooltip"
+            [attr.aria-label]="'DASHBOARD.TOOLTIPS.FARM_SUMMARY' | translate"
+          ><mat-icon aria-hidden="true">info</mat-icon></button>
+        </p>
+        <p class="farm-summary-subtitle" *ngIf="selectedZoneName">{{ selectedZoneName }}</p>
+      </div>
+      <div class="crop-health-wrap">
+        <span class="crop-health-badge" [ngClass]="cropHealthClass">
+          <span class="crop-health-dot"></span>
+          {{ cropHealthKey | translate }}
+        </span>
+        <button
+          type="button"
+          class="info-icon"
+          [matTooltip]="'DASHBOARD.TOOLTIPS.CROP_HEALTH' | translate"
+          matTooltipPosition="below"
+          matTooltipClass="app-tooltip"
+          [attr.aria-label]="'DASHBOARD.TOOLTIPS.CROP_HEALTH' | translate"
+        ><mat-icon aria-hidden="true">info</mat-icon></button>
+      </div>
+    </div>
+
+    <div class="farm-summary-facts">
+      <div class="fact-chip">
+        <span class="fact-chip-icon"><mat-icon>eco</mat-icon></span>
+        <div>
+          <span>{{ 'DASHBOARD.SUMMARY.PLANT' | translate }}</span>
+          <strong>{{ deviceSettings?.plantName || ('DASHBOARD.SUMMARY.PLANT_NOT_SET' | translate) }}</strong>
+        </div>
+      </div>
+
+      <div class="fact-chip">
+        <span class="fact-chip-icon"><mat-icon>timeline</mat-icon></span>
+        <div>
+          <span>{{ 'DASHBOARD.SUMMARY.GROWTH_STAGE' | translate }}</span>
+          <strong>{{ growthStageKey | translate }}</strong>
+        </div>
+      </div>
+
+      <div class="fact-chip">
+        <span class="fact-chip-icon"><mat-icon>tune</mat-icon></span>
+        <div>
+          <span>{{ 'DASHBOARD.SUMMARY.IRRIGATION_MODE' | translate }}</span>
+          <strong>{{ irrigationModeKey | translate }}</strong>
+        </div>
+      </div>
+
+      <div class="fact-chip" [ngClass]="nextIrrigationClass">
+        <span class="fact-chip-icon"><mat-icon>schedule</mat-icon></span>
+        <div>
+          <span>{{ 'DASHBOARD.SUMMARY.NEXT_IRRIGATION' | translate }}</span>
+          <strong>{{ nextIrrigationKey | translate }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-recommendation-banner" [ngClass]="cropHealthClass">
+      <span class="ai-recommendation-icon"><mat-icon>psychology</mat-icon></span>
+      <div>
+        <span>
+          {{ 'DASHBOARD.SUMMARY.AI_RECOMMENDATION' | translate }}
+          <button
+            type="button"
+            class="info-icon"
+            [matTooltip]="'DASHBOARD.TOOLTIPS.AI_RECOMMENDATION' | translate"
+            matTooltipPosition="below"
+            matTooltipClass="app-tooltip"
+            [attr.aria-label]="'DASHBOARD.TOOLTIPS.AI_RECOMMENDATION' | translate"
+          ><mat-icon aria-hidden="true">info</mat-icon></button>
+        </span>
+        <p>{{ aiRecommendationKey | translate }}</p>
+      </div>
     </div>
   </section>
 </section>

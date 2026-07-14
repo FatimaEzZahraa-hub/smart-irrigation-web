@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthService } from '../../services/auth.service';
@@ -9,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, MatIconModule, TranslatePipe],
   templateUrl: './signup.html',
   styleUrl: './signup.css'
 })
@@ -66,7 +67,6 @@ export class Signup {
         setTimeout(() => this.router.navigate(['/login']), 1200);
       },
       error: (err) => {
-        console.error('Signup error:', err);
         this.errorMessage = this.getServerErrorMessage(err);
         this.isLoading = false;
       }

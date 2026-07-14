@@ -1,0 +1,70 @@
+<div class="admin-login-container">
+  <div class="admin-login-brand">
+    <div class="admin-brand-logo">
+      <div class="admin-brand-logo-icon"><mat-icon>admin_panel_settings</mat-icon></div>
+      <span class="admin-brand-logo-name">AgroSync Admin</span>
+    </div>
+
+    <h1 class="admin-brand-tagline">
+      Supervise your<br>
+      <span>Smart Irrigation platform</span>
+    </h1>
+    <p class="admin-brand-desc">
+      Manage users, devices, alerts and platform-wide statistics from one secure administration console.
+    </p>
+  </div>
+
+  <div class="admin-login-form-panel">
+    <div class="admin-login-card">
+      <p class="admin-login-card-eyebrow">Administration</p>
+      <h2 class="admin-login-card-title">Admin sign in</h2>
+      <p class="admin-login-card-subtitle">Restricted access — administrators only.</p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="admin-form-group">
+          <label class="admin-form-label" for="admin-login-email">Email</label>
+          <input
+            id="admin-login-email"
+            class="admin-form-input"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            placeholder="admin@agrosync.com"
+          >
+        </div>
+
+        <div class="admin-form-group">
+          <label class="admin-form-label" for="admin-login-password">Password</label>
+          <div class="admin-form-input-wrapper">
+            <input
+              id="admin-login-password"
+              class="admin-form-input"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="current-password"
+              placeholder="••••••••"
+            >
+            <button
+              type="button"
+              class="admin-form-input-toggle"
+              (click)="showPassword = !showPassword"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+              tabindex="-1"
+            >
+              <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="errorMessage" class="admin-form-message admin-form-message-error">
+          {{ errorMessage }}
+        </div>
+
+        <button class="admin-form-btn" type="submit" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Sign in</span>
+          <span *ngIf="isLoading">Signing in…</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

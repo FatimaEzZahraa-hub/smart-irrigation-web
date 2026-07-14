@@ -1,0 +1,76 @@
+<section class="admin-devices-page page-content">
+  <header class="page-toolbar">
+    <div>
+      <p class="page-eyebrow">Administration</p>
+      <h2>Devices</h2>
+    </div>
+  </header>
+
+  <div class="admin-error-banner surface-card" *ngIf="errorMessage">
+    <mat-icon>error_outline</mat-icon>
+    {{ errorMessage }}
+  </div>
+
+  <div class="admin-loading" *ngIf="isLoading">
+    <mat-icon>autorenew</mat-icon>
+    Loading devices…
+  </div>
+
+  <div class="admin-table-wrap surface-card" *ngIf="!isLoading && devices.length > 0">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Device</th>
+          <th>Owner</th>
+          <th>Location</th>
+          <th>Mode</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let device of devices">
+          <td>{{ device.name }}</td>
+          <td>{{ ownerName(device.userId) }}</td>
+          <td>{{ device.location || 'Unknown' }}</td>
+          <td>
+            <span class="admin-mode-pill">{{ device.mode }}</span>
+          </td>
+          <td>
+            <span class="admin-status-pill" [class.active]="device.active" [class.inactive]="!device.active">
+              {{ device.active ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td class="admin-table-actions">
+            <button
+              type="button"
+              class="admin-icon-btn"
+              [class.danger]="device.active"
+              [title]="device.active ? 'Deactivate device' : 'Activate device'"
+              (click)="requestToggle(device)"
+            >
+              <mat-icon>{{ device.active ? 'toggle_off' : 'toggle_on' }}</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="admin-empty-state surface-card" *ngIf="!isLoading && devices.length === 0 && !errorMessage">
+    <mat-icon>sensors_off</mat-icon>
+    <p>No devices registered yet.</p>
+  </div>
+
+  <app-admin-confirm-dialog
+    *ngIf="pendingDevice as device"
+    [title]="device.active ? 'Deactivate device' : 'Activate device'"
+    [message]="device.active
+      ? ('Deactivate ' + device.name + '? This only affects admin supervision status, irrigation settings are untouched.')
+      : ('Activate ' + device.name + '?')"
+    [confirmLabel]="device.active ? 'Deactivate' : 'Activate'"
+    [danger]="device.active"
+    (confirmed)="confirmToggle()"
+    (cancelled)="cancelToggle()"
+  ></app-admin-confirm-dialog>
+</section>

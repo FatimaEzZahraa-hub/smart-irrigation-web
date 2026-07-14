@@ -1,0 +1,40 @@
+<aside class="admin-sidebar">
+  <div class="admin-sidebar-logo">
+    <div class="admin-sidebar-logo-icon">
+      <mat-icon>admin_panel_settings</mat-icon>
+    </div>
+    <div class="admin-sidebar-logo-text">
+      <span class="admin-sidebar-logo-name">AgroSync</span>
+      <span class="admin-sidebar-logo-tag">Admin Panel</span>
+    </div>
+  </div>
+
+  <nav class="admin-sidebar-nav">
+    <a routerLink="/admin/dashboard" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>dashboard</mat-icon></span>
+      <span class="nav-label">Dashboard</span>
+    </a>
+
+    <a routerLink="/admin/users" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>group</mat-icon></span>
+      <span class="nav-label">Users</span>
+    </a>
+
+    <a routerLink="/admin/devices" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>sensors</mat-icon></span>
+      <span class="nav-label">Devices</span>
+    </a>
+
+    <a routerLink="/admin/alerts" routerLinkActive="active">
+      <span class="nav-icon"><mat-icon>notifications</mat-icon></span>
+      <span class="nav-label">Alerts</span>
+    </a>
+  </nav>
+
+  <div class="admin-sidebar-footer">
+    <button type="button" (click)="logout()">
+      <span class="nav-icon"><mat-icon>logout</mat-icon></span>
+      <span class="nav-label">Logout</span>
+    </button>
+  </div>
+</aside>
